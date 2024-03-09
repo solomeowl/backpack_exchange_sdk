@@ -60,3 +60,9 @@ print(ticker)
 
 ## Documentation
 For more detailed information about the API endpoints and their usage, refer to the [Backpack Exchange API documentation](https://docs.backpack.exchange/).
+
+## Support 
+
+If this SDK has been helpful to you 🌟 and you haven't signed up for Backpack Exchange yet, please consider using the following referral link to register: [Register on Backpack Exchange](https://backpack.exchange/refer/solomeowl) 🚀.
+
+Using this referral link is a great way to support this project ❤️, as it helps to grow the community and ensures the continued development of the SDK. 🛠️
