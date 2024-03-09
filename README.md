@@ -1,4 +1,6 @@
 # Backpack Exchange SDK
+![PyPI - Version](https://img.shields.io/pypi/v/backpack-exchange-sdk)
+
 
 The Backpack Exchange SDK provides a convenient interface for interacting with the Backpack Exchange API. It includes two main clients: `AuthenticationClient` for authenticated endpoints and `PublicClient` for public endpoints.
 
