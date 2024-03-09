@@ -25,7 +25,7 @@ pip3 install .
 
 ## Usage
 ### Authentication Client
-```python=
+```python
 from backpack_exchange_sdk import AuthenticationClient
 
 client = AuthenticationClient()
@@ -41,7 +41,7 @@ print(response)
 
 ```
 ### Public Client
-```python=
+```python
 from backpack_exchange_sdk import PublicClient
 
 public_client = PublicClient()
