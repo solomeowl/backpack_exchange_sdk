@@ -32,4 +32,4 @@ print(public_client.get_system_time())
 print(public_client.get_recent_trades('SOL_USDC'))
 
 # get historical trades
-print(public_client.get_historical_trades('SOL_USDC',10,0))
+print(public_client.get_historical_trades('SOL_USDC', 10, 0))
