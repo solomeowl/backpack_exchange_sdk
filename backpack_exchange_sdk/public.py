@@ -1,10 +1,13 @@
 import requests
 
+
 class PublicClient:
     def __init__(self):
         self.base_url = 'https://api.backpack.exchange/'
-    
+
+    # ================================================================
     # Market - Public market data.
+    # ================================================================
     def get_assets(self):
         """
         Retrieves all the assets that are supported by the exchange.
@@ -22,7 +25,7 @@ class PublicClient:
         Retrieves summarised statistics for the last 24 hours for the given market symbol.
         """
         return requests.get(url=f'{self.base_url}api/v1/ticker', params={'symbol': symbol}).json()
-    
+
     def get_tickers(self):
         """
         Retrieves summarised statistics for the last 24 hours for all market symbols.
@@ -46,8 +49,9 @@ class PublicClient:
             params['endTime'] = end_time
         return requests.get(url=f'{self.base_url}api/v1/klines', params=params).json()
 
-
+    # ================================================================
     # System - Exchange system status.
+    # ================================================================
     def get_status(self):
         """
         Get the system status, and the status message, if any.
@@ -66,7 +70,9 @@ class PublicClient:
         """
         return requests.get(url=f'{self.base_url}api/v1/time').text
 
+    # ================================================================
     # Trades - Public trade data.
+    # ================================================================
     def get_recent_trades(self, symbol: str, limit: int = 100):
         """
         Retrieve the most recent trades for a symbol. This is public data and is not specific to any account.
