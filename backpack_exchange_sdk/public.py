@@ -40,7 +40,9 @@ class PublicClient:
 
     def get_klines(self, symbol: str, interval: str, start_time: int = 0, end_time: int = 0):
         """
-        Get K-Lines for the given market symbol, optionally providing a startTime and endTime. If no startTime is provided, the interval duration will be used. If no endTime is provided, the current time will be used.
+        Get K-Lines for the given market symbol, optionally providing a startTime and endTime.
+        If no startTime is provided, the interval duration will be used. If no endTime is provided,
+        the current time will be used.
         """
         params = {'symbol': symbol, 'interval': interval}
         if start_time > 0:
@@ -76,14 +78,16 @@ class PublicClient:
     def get_recent_trades(self, symbol: str, limit: int = 100):
         """
         Retrieve the most recent trades for a symbol. This is public data and is not specific to any account.
-        The maximum available recent trades is 1000. If you need more than 1000 trades use the historical trades endpoint.
+        The maximum available recent trades is 1000. If you need more than 1000 trades use the historical trades
+        endpoint.
         """
         params = {'symbol': symbol, 'limit': limit}
         return requests.get(url=f'{self.base_url}api/v1/trades', params=params).json()
 
     def get_historical_trades(self, symbol: str, limit: int = 100, offset: int = 0):
         """
-        Retrieves all historical trades for the given symbol. This is public trade data and is not specific to any account.
+        Retrieves all historical trades for the given symbol. This is public trade data and is not specific to any
+        account.
         """
         params = {'symbol': symbol, 'limit': limit, 'offset': offset}
         return requests.get(url=f'{self.base_url}api/v1/trades/history', params=params).json()
