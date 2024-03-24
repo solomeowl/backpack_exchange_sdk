@@ -16,8 +16,8 @@ print(client.request_withdrawal('xxxxxxxxxx',
 # ================================================================
 # History - Historical account data.
 # ================================================================
-print(client.get_order_history('SOL_USDC'))
-print(client.get_fill_history('SOL_USDC'))
+print(client.get_order_history(symbol='SOL_USDC'))
+print(client.get_fill_history(symbol='SOL_USDC'))
 
 # ================================================================
 # Order - Order management.

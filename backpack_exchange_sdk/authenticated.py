@@ -115,7 +115,7 @@ class AuthenticationClient:
     # ================================================================
     # History - Historical account data.
     # ================================================================
-    def get_order_history(self, symbol: str = None, limit: int = 100, offset: int = 0):
+    def get_order_history(self, orderId: str = None, symbol: str = None, limit: int = 100, offset: int = 0):
         """
         Retrieves the order history for the user. This includes orders that have been filled and are no longer on
         the book. It may include orders that are on the book, but the /orders endpoint contains more up-to date data.
@@ -123,9 +123,11 @@ class AuthenticationClient:
         params = {'limit': limit, 'offset': offset}
         if symbol:
             params['symbol'] = symbol
+        if orderId:
+            params['orderId'] = orderId
         return self._send_request('GET', 'wapi/v1/history/orders', 'orderHistoryQueryAll', params)
 
-    def get_fill_history(self, orderId: str = None, symbol: str = None, limit: int = 100, offset: int = 0):
+    def get_fill_history(self, orderId: str = None, symbol: str = None, fromTimestamp: int = False, toTimestamp: int = False, limit: int = 100, offset: int = 0):
         """
         Retrieves historical fills, with optional filtering for a specific order or symbol.
         """
@@ -134,6 +136,10 @@ class AuthenticationClient:
             params['symbol'] = symbol
         if orderId:
             params['orderId'] = orderId
+        if fromTimestamp:
+            params['from'] = fromTimestamp
+        if toTimestamp:
+            params['to'] = toTimestamp
         return self._send_request('GET', 'wapi/v1/history/fills', 'fillHistoryQueryAll', params)
     # ================================================================
     # Order - Order management.
