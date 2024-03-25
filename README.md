@@ -30,8 +30,7 @@ pip3 install .
 ```python
 from backpack_exchange_sdk import AuthenticationClient
 
-client = AuthenticationClient()
-client.setup('<YOUR_API_KEY>', '<YOUR_SECRET>')
+client = AuthenticationClient('<YOUR_API_KEY>', '<YOUR_SECRET>')
 
 # Get account balances
 balances = client.get_balances()
