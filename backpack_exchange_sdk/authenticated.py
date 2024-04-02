@@ -17,7 +17,7 @@ class AuthenticationClient:
         )
         self.window = window
 
-    def _send_request(self, method, endpoint, action, params):
+    def _send_request(self, method, endpoint, action, params=None):
         url = f'{self.base_url}{endpoint}'
         ts = int(time.time() * 1e3)
         headers = self._generate_signature(action, ts, params)
@@ -39,13 +39,18 @@ class AuthenticationClient:
             return text
 
     def _generate_signature(self, action: str, timestamp: int, params=None):
-        if 'postOnly' in params:
-            params = params.copy()
-            params['postOnly'] = str(params['postOnly']).lower()
-        param_str = "&"+"&".join(f"{k}={v}" for k, v in sorted(params.items()))
+        if params:
+            if 'postOnly' in params:
+                params = params.copy()
+                params['postOnly'] = str(params['postOnly']).lower()
+            param_str = "&" + \
+                "&".join(f"{k}={v}" for k, v in sorted(params.items()))
+        else:
+            param_str = ''
         if not param_str:
             param_str = ''
         sign_str = f"instruction={action}{param_str}&timestamp={timestamp}&window={self.window}"
+        print(sign_str)
         signature = base64.b64encode(
             self.private_key_obj.sign(sign_str.encode())).decode()
         return {
@@ -64,7 +69,7 @@ class AuthenticationClient:
         Retrieves account balances and the state of the balances (locked or available).
         Locked assets are those that are currently in an open order.
         """
-        return self._send_request('GET', 'api/v1/capital', 'balanceQuery', {})
+        return self._send_request('GET', 'api/v1/capital', 'balanceQuery')
 
     def get_deposits(self, limit: int = 100, offset: int = 0):
         """
