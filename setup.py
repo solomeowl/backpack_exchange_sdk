@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="backpack_exchange_sdk",
-    version="0.3.0",
+    version="0.3.1",
     author="solomeowl",
     author_email="j19940430@gmail.com",
     description="A simple SDK for backpack exchange",
