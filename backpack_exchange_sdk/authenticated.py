@@ -50,7 +50,6 @@ class AuthenticationClient:
         if not param_str:
             param_str = ''
         sign_str = f"instruction={action}{param_str}&timestamp={timestamp}&window={self.window}"
-        print(sign_str)
         signature = base64.b64encode(
             self.private_key_obj.sign(sign_str.encode())).decode()
         return {
