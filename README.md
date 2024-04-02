@@ -43,7 +43,7 @@ print(response)
 ```
 ### Public Client
 ```python
-from backpack_exchange_sdk import PublicClient
+from backpack_exchange_sdk.public import PublicClient
 
 public_client = PublicClient()
 
