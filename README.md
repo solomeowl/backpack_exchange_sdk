@@ -28,7 +28,7 @@ pip3 install .
 ## Usage
 ### Authentication Client
 ```python
-from backpack_exchange_sdk import AuthenticationClient
+from backpack_exchange_sdk.authenticated import AuthenticationClient
 
 client = AuthenticationClient('<YOUR_API_KEY>', '<YOUR_SECRET>')
 
