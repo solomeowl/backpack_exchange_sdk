@@ -70,11 +70,15 @@ class AuthenticationClient:
         """
         return self._send_request('GET', 'api/v1/capital', 'balanceQuery')
 
-    def get_deposits(self, limit: int = 100, offset: int = 0):
+    def get_deposits(self, fromTimestamp: int = False, toTimestamp: int = False, limit: int = 100, offset: int = 0):
         """
         Retrieves deposit history.
         """
         params = {'limit': limit, 'offset': offset}
+        if fromTimestamp:
+            params['from'] = fromTimestamp
+        if toTimestamp:
+            params['to'] = toTimestamp
         return self._send_request('GET', 'wapi/v1/capital/deposits', 'depositQueryAll', params)
 
     def get_deposit_address(self, blockchain_name: str):
@@ -84,11 +88,15 @@ class AuthenticationClient:
         params = {'blockchain': blockchain_name}
         return self._send_request('GET', 'wapi/v1/capital/deposit/address', 'depositAddressQuery', params)
 
-    def get_withdrawals(self, limit: int = 100, offset: int = 0):
+    def get_withdrawals(self, fromTimestamp: int = False, toTimestamp: int = False, limit: int = 100, offset: int = 0):
         """
         Retrieves withdrawal history.
         """
         params = {'limit': limit, 'offset': offset}
+        if fromTimestamp:
+            params['from'] = fromTimestamp
+        if toTimestamp:
+            params['to'] = toTimestamp
         return self._send_request('GET', 'wapi/v1/capital/withdrawals', 'withdrawalQueryAll', params)
 
     def request_withdrawal(self, address: str,
