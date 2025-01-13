@@ -1,5 +1,5 @@
 import requests
-from typing import List
+from typing import List, Optional
 from .models import Asset, ApiError, CollateralInfo, Market, Ticker, Depth, Kline, MarkPrice, OpenInterest, FundingRate, SystemStatus, Trade  # 匯入模型
 from pydantic import ValidationError
 
@@ -10,11 +10,13 @@ class PublicClient:
 
     def _get(self, endpoint, params=None):
         response = requests.get(url=f'{self.base_url}{endpoint}', params=params)
-        if 200 <= response.status_code < 300:  
-            if response.status_code == 204: 
+
+        if 200 <= response.status_code < 300:
+            if response.status_code == 204:
                 return None
             try:
-                return response.json()
+                response_data = response.json()
+                return response_data
             except ValueError:
                 return response.text
         else:
@@ -45,7 +47,7 @@ class PublicClient:
         """
         Retrieves all the markets that are supported by the exchange.
         """
-        response_data = self._get('api/v1/markets')
+        response_data = self._get("api/v1/markets")
         return [Market(**item) for item in response_data]
 
     def get_market(self, symbol: str) -> Market:
@@ -76,16 +78,14 @@ class PublicClient:
         response_data = self._get('api/v1/depth', params={'symbol': symbol})
         return Depth(**response_data)
 
-    def get_klines(self, symbol: str, interval: str, start_time: int = 0, end_time: int = 0) -> List[Kline]:
+    def get_klines(self, symbol: str, interval: str, start_time: int, end_time: int = None) -> List[Kline]:
         """
-        Get K-Lines for the given market symbol, optionally providing a startTime and endTime.
-        If no startTime is provided, the interval duration will be used. If no endTime is provided,
-        the current time will be used.
+        Get K-Lines for the given market symbol, providing a startTime and optionally an endTime.
+        If no endTime is provided, the current time will be used.
         """
-        params = {'symbol': symbol, 'interval': interval}
-        if start_time > 0:
-            params['startTime'] = start_time
-        if end_time > 0:
+        params = {'symbol': symbol, 'interval': interval,
+                  'startTime': start_time}
+        if end_time is not None:
             params['endTime'] = end_time
         response_data = self._get('api/v1/klines', params=params)
         return [Kline(**item) for item in response_data]
