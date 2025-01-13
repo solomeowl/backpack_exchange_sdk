@@ -61,6 +61,33 @@ class AuthenticationClient:
         }
 
     # ================================================================
+    # Account - Account settings.
+    # ================================================================
+    def get_account(self):
+        return self._send_request('GET', 'api/v1/account', 'accountQuery')
+
+    def update_account(self, autoBorrowSettlements: bool = None,
+                       autoLend: bool = None,
+                       autoRealizePnl: bool = None,
+                       autoRepayBorrows: bool = None,
+                       leverageLimit: str = None):
+        """
+        Update account settings.
+        """
+        data = {}
+        if autoBorrowSettlements is not None:
+            data['autoBorrowSettlements'] = autoBorrowSettlements
+        if autoLend is not None:
+            data['autoLend'] = autoLend
+        if autoRealizePnl is not None:
+            data['autoRealizePnl'] = autoRealizePnl
+        if autoRepayBorrows is not None:
+            data['autoRepayBorrows'] = autoRepayBorrows
+        if leverageLimit is not None:
+            data['leverageLimit'] = leverageLimit
+        return self._send_request('PATCH', 'api/v1/account', 'accountUpdate', data)
+
+    # ================================================================
     # Capital - Capital management.
     # ================================================================
     def get_balances(self):
@@ -69,6 +96,15 @@ class AuthenticationClient:
         Locked assets are those that are currently in an open order.
         """
         return self._send_request('GET', 'api/v1/capital', 'balanceQuery')
+
+    def get_collateral(self, subAccountId: int = None):
+        """
+        Retrieves collateral information for an account.
+        """
+        params = {}
+        if subAccountId is not None:
+            params['subaccountId'] = subAccountId
+        return self._send_request('GET', 'api/v1/capital/collateral', 'collateralQuery', params)
 
     def get_deposits(self, fromTimestamp: int = False, toTimestamp: int = False, limit: int = 100, offset: int = 0):
         """
@@ -127,6 +163,97 @@ class AuthenticationClient:
     # ================================================================
     # History - Historical account data.
     # ================================================================
+    def get_borrow_history(self, type: str = None,
+                           sources: str = None,
+                           positionId: str = None,
+                           symbol: str = None,
+                           limit: int = 100,
+                           offset: int = 0):
+        """
+        History of borrow and lend operations for the account.
+        """
+        params = {'limit': limit, 'offset': offset}
+        if type:
+            params['type'] = type
+        if sources:
+            params['sources'] = sources
+        if positionId:
+            params['positionId'] = positionId
+        if symbol:
+            params['symbol'] = symbol
+        return self._send_request('GET', 'wapi/v1/history/borrowLend', 'borrowHistoryQueryAll', params)
+
+    def get_interest_history(self, symbol: str = None,
+                             positionId: str = None,
+                             limit: int = 100,
+                             offset: int = 0,
+                             sources: str = None,
+                             ):
+        """
+        History of the interest payments for borrows and lends for the account.
+        """
+        params = {'limit': limit, 'offset': offset}
+        if symbol:
+            params['symbol'] = symbol
+        if positionId:
+            params['positionId'] = positionId
+        if sources:
+            params['sources'] = sources
+        return self._send_request('GET', 'wapi/v1/history/interest', 'interestHistoryQueryAll', params)
+
+    def get_borrow_position_history(self, symbol: str = None,
+                                    side: str = None,
+                                    state: str = None,
+                                    limit: int = 100,
+                                    offset: int = 0,
+                                    ):
+        """
+        History of borrow and lend positions for the account.
+        """
+        params = {'limit': limit, 'offset': offset}
+        if symbol:
+            params['symbol'] = symbol
+        if side:
+            params['side'] = side
+        if state:
+            params['state'] = state
+        return self._send_request('GET', 'wapi/v1/history/borrowLend/positions', '', params)
+
+    def get_fill_history(self, orderId: str = None,
+                         fromTimestamp: int = False,
+                         toTimestamp: int = False,
+                         symbol: str = None,
+                         limit: int = 100,
+                         offset: int = 0,
+                         fillType: str = None,
+                         ):
+        """
+        Retrieves historical fills, with optional filtering for a specific order or symbol.
+        """
+        params = {'limit': limit, 'offset': offset}
+        if orderId:
+            params['orderId'] = orderId
+        if fromTimestamp:
+            params['from'] = fromTimestamp
+        if toTimestamp:
+            params['to'] = toTimestamp
+        if symbol:
+            params['symbol'] = symbol
+        if fillType:
+            params['fillType'] = fillType
+        return self._send_request('GET', 'wapi/v1/history/fills', 'fillHistoryQueryAll', params)
+
+    def get_funding_payments(self, subaccountId: int = None, symbol: str = None, limit: int = 100, offset: int = 0):
+        """
+        Users funding payment history for futures.
+        """
+        params = {'limit': limit, 'offset': offset}
+        if subaccountId:
+            params['subaccountId'] = subaccountId
+        if symbol:
+            params['symbol'] = symbol
+        return self._send_request('GET', 'wapi/v1/history/funding', 'fundingHistoryQueryAll', params)
+
     def get_order_history(self, orderId: str = None, symbol: str = None, limit: int = 100, offset: int = 0):
         """
         Retrieves the order history for the user. This includes orders that have been filled and are no longer on
@@ -139,28 +266,35 @@ class AuthenticationClient:
             params['orderId'] = orderId
         return self._send_request('GET', 'wapi/v1/history/orders', 'orderHistoryQueryAll', params)
 
-    def get_fill_history(self, orderId: str = None, symbol: str = None, fromTimestamp: int = False, toTimestamp: int = False, limit: int = 100, offset: int = 0):
+    def get_pnl_history(self, subaccountId: int = None, symbol: str = None, limit: int = 100, offset: int = 0):
         """
-        Retrieves historical fills, with optional filtering for a specific order or symbol.
+        History of profit and loss realization for an account.
         """
         params = {'limit': limit, 'offset': offset}
+        if subaccountId:
+            params['subaccountId'] = subaccountId
         if symbol:
             params['symbol'] = symbol
-        if orderId:
-            params['orderId'] = orderId
-        if fromTimestamp:
-            params['from'] = fromTimestamp
-        if toTimestamp:
-            params['to'] = toTimestamp
-        return self._send_request('GET', 'wapi/v1/history/fills', 'fillHistoryQueryAll', params)
+        return self._send_request('GET', 'wapi/v1/history/pnl', 'pnlHistoryQueryAll', params)
+
+    def get_settlement_history(self, limit: int = 100, offset: int = 0, source: str = None):
+        """
+        History of settlement operations for the account.
+        """
+        params = {'limit': limit, 'offset': offset}
+        if source:
+            params['source'] = source
+        return self._send_request('GET', 'wapi/v1/history/settlement', 'settlementHistoryQueryAll', params)
+
     # ================================================================
     # Order - Order management.
     # ================================================================
 
     def get_users_open_orders(self, symbol: str, clientId: int = False, orderId: str = None):
         """
-        Retrieves an open order from the order book. This only returns the order if it is resting on the order book
+        Retrieves an open order from the order book. This only returns the order if it is resting on the order book 
         (i.e. has not been completely filled, expired, or cancelled).
+        One of orderId or clientId must be specified. If both are specified then the request will be rejected.
         """
         params = {'symbol': symbol}
         if clientId:

@@ -6,7 +6,7 @@ class PublicClient:
         self.base_url = 'https://api.backpack.exchange/'
 
     # ================================================================
-    # Market - Public market data.
+    # Assets - Assets and collateral data.
     # ================================================================
     def get_assets(self):
         """
@@ -14,11 +14,26 @@ class PublicClient:
         """
         return requests.get(url=f'{self.base_url}api/v1/assets').json()
 
+    def get_collateral(self):
+        """
+        Get collateral parameters for assets.
+        """
+        return requests.get(url=f'{self.base_url}api/v1/collateral').json()
+
+    # ================================================================
+    # Market - Public market data.
+    # ================================================================
     def get_markets(self):
         """
         Retrieves all the markets that are supported by the exchange.
         """
         return requests.get(url=f'{self.base_url}api/v1/markets').json()
+
+    def get_market(self, symbol: str):
+        """
+        Retrieves a market supported by the exchange.
+        """
+        return requests.get(url=f'{self.base_url}api/v1/market', params={'symbol': symbol}).json()
 
     def get_ticker(self, symbol: str):
         """
@@ -32,7 +47,7 @@ class PublicClient:
         """
         return requests.get(url=f'{self.base_url}api/v1/tickers').json()
 
-    def get_order_book_depth(self, symbol: str):
+    def get_depth(self, symbol: str):
         """
         Retrieves the order book depth for a given market symbol.
         """
@@ -50,6 +65,26 @@ class PublicClient:
         if end_time > 0:
             params['endTime'] = end_time
         return requests.get(url=f'{self.base_url}api/v1/klines', params=params).json()
+
+    def get_mark_price(self, symbol: str):
+        """
+        Retrieves mark price, index price and funding rate for the given market symbol.
+        """
+        return requests.get(url=f'{self.base_url}api/v1/markPrice', params={'symbol': symbol}).json()
+
+    def get_open_interest(self, symbol: str):
+        """
+        Retrieves the current open interest for the given market.
+        """
+        return requests.get(url=f'{self.base_url}api/v1/openInterest', params={'symbol': symbol}).json()
+
+    def get_funding_interval_rates(self, symbol: str, limit: int = 100, offset: int = 0):
+        """
+        Funding interval rate history for futures.
+        """
+        params = {'symbol': symbol, 'limit': limit, 'offset': offset}
+        return requests.get(url=f'{self.base_url}api/v1/fundingRates', params=params).json()
+
 
     # ================================================================
     # System - Exchange system status.
