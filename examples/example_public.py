@@ -1,4 +1,6 @@
+import time
 from backpack_exchange_sdk.public import PublicClient
+
 public_client = PublicClient()
 
 # Get assets
@@ -26,13 +28,13 @@ print(public_client.get_tickers())
 print(public_client.get_depth('SOL_USDC'))
 
 # Get K-Lines for a specific market
-print(public_client.get_klines('SOL_USDC', '1m'))
+print(public_client.get_klines('SOL_USDC', '1m', int(time.time())))
 
 # Get mark price for a specific market
-print(public_client.get_mark_price('SOL_USDC'))
+# print(public_client.get_mark_price('SOL_USDC'))
 
 # Get open interest for a specific market
-print(public_client.get_open_interest('SOL_USDC'))
+# print(public_client.get_open_interest('SOL_USDC'))
 
 # Get funding interval rates for a specific market
 print(public_client.get_funding_interval_rates('SOL_USDC'))
@@ -41,7 +43,7 @@ print(public_client.get_funding_interval_rates('SOL_USDC'))
 # System - Exchange system status.
 # ================================================================
 # Get system status
-print(public_client.get_status())
+# print(public_client.get_status())
 
 # Send ping
 print(public_client.send_ping())
@@ -53,7 +55,7 @@ print(public_client.get_system_time())
 # Trades - Public trade data.
 # ================================================================
 # Get recent trades for a specific market
-print(public_client.get_recent_trades('SOL_USDC'))
+print(public_client.get_recent_trades('SOL_USDC_PERP'))
 
 # Get historical trades for a specific market
-print(public_client.get_historical_trades('SOL_USDC', 10, 0))
+print(public_client.get_historical_trades('SOL_USDC_PERP', 10, 0))

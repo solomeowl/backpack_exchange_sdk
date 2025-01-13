@@ -1,10 +1,16 @@
-from pydantic import BaseModel
-from typing import List, Tuple, Dict
+from pydantic import BaseModel, RootModel
+from typing import List, Tuple, Dict, Optional
 
 
 class Token(BaseModel):
     blockchain: str
-    address: str
+    contractAddress: Optional[str] = None
+    depositEnabled: bool
+    minimumDeposit: str
+    withdrawEnabled: bool
+    minimumWithdrawal: str
+    maximumWithdrawal: Optional[str] = None
+    withdrawalFee: str
 
 
 class Asset(BaseModel):
@@ -24,7 +30,7 @@ class SqrtFunction(BaseModel):
 
 
 class CollateralFunctionKind(BaseModel):
-    weight: str
+    type: str
 
 
 class CollateralFunction(BaseModel):
@@ -54,34 +60,34 @@ class PremiumBand(BaseModel):
     tolerancePct: str
 
 
-class PriceFilter(BaseModel):
-    minPrice: str
-    maxPrice: str = None
-    tickSize: str
-    maxMultiplier: str = None
-    minMultiplier: str = None
-    maxImpactMultiplier: str = None
-    minImpactMultiplier: str = None
-    meanMarkPriceBand: PriceBand = None
-    meanPremiumBand: PremiumBand = None
-
-
 class QuantityFilter(BaseModel):
     minQuantity: str
-    maxQuantity: str = None
+    maxQuantity: Optional[str] = None
     stepSize: str
 
 
 class LeverageFilter(BaseModel):
-    minLeverage: int
-    maxLeverage: int
-    stepSize: int
+    minLeverage: Optional[int] = None
+    maxLeverage: Optional[int] = None
+    stepSize: Optional[int] = None
+
+
+class PriceFilter(BaseModel):
+    minPrice: str
+    maxPrice: Optional[str] = None
+    tickSize: str
+    maxMultiplier: Optional[str] = None
+    minMultiplier: Optional[str] = None
+    maxImpactMultiplier: Optional[str] = None
+    minImpactMultiplier: Optional[str] = None
+    meanMarkPriceBand: Optional[PriceBand] = None
+    meanPremiumBand: Optional[PremiumBand] = None
 
 
 class MarketFilters(BaseModel):
     price: PriceFilter
     quantity: QuantityFilter
-    leverage: LeverageFilter = None
+    leverage: Optional[LeverageFilter] = None
 
 
 class Market(BaseModel):
@@ -89,7 +95,10 @@ class Market(BaseModel):
     baseSymbol: str
     quoteSymbol: str
     filters: MarketFilters
-    fundingInterval: int = None  # Optional for non-perpetual markets
+    fundingInterval: Optional[int] = None
+    imfFunction: Optional[dict] = None
+    mmfFunction: Optional[dict] = None
+    marketType: str
 
 
 class Ticker(BaseModel):
@@ -134,7 +143,7 @@ class MarkPrice(BaseModel):
 
 class OpenInterest(BaseModel):
     symbol: str
-    openInterest: str = None  # Optional as per API doc
+    openInterest: str = None
     timestamp: int
 
 
@@ -145,34 +154,17 @@ class FundingRate(BaseModel):
 
 
 class SystemStatus(BaseModel):
-    status: str  # Enum: "Ok" "Maintenance"
-    message: str = None  # Optional status message
+    status: str
+    message: Optional[str] = None
 
 
 class Trade(BaseModel):
-    id: int = None  # Optional as per API doc
+    id: Optional[int] = None
     price: str
     quantity: str
     quoteQuantity: str
     timestamp: int
     isBuyerMaker: bool
-
-
-class Account(BaseModel):
-    autoBorrowSettlements: bool
-    autoLend: bool
-    autoRealizePnl: bool
-    autoRepayBorrows: bool
-    borrowLimit: str
-    futuresMakerFee: str
-    futuresTakerFee: str
-    leverageLimit: str
-    limitOrders: int
-    liquidating: bool
-    positionLimit: str
-    spotMakerFee: str
-    spotTakerFee: str
-    triggerOrders: int
 
 
 class Balance(BaseModel):
@@ -181,8 +173,8 @@ class Balance(BaseModel):
     staked: str
 
 
-class Balances(BaseModel):
-    __root__: Dict[str, Balance]
+class Balances(RootModel):
+    root: Dict[str, Balance]
 
 
 class CollateralAsset(BaseModel):
@@ -200,19 +192,10 @@ class CollateralAsset(BaseModel):
 
 
 class CollateralInfo(BaseModel):
-    assetsValue: str
-    borrowLiability: str
-    collateral: List[CollateralAsset]
-    liabilitiesValue: str
-    marginFraction: str = None
-    mmf: str
-    netEquity: str
-    netEquityAvailable: str
-    netEquityLocked: str
-    netExposureFutures: str
-    pnlUnrealized: str
-    subaccountId: int = None
-    userId: int
+    symbol: str
+    imfFunction: CollateralFunction
+    mmfFunction: CollateralFunction
+    haircutFunction: HaircutFunction
 
 
 class Deposit(BaseModel):
