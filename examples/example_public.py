@@ -1,35 +1,59 @@
 from backpack_exchange_sdk.public import PublicClient
 public_client = PublicClient()
 
-# get assets
+# Get assets
 print(public_client.get_assets())
 
-# get markets
+# Get collateral parameters for assets
+print(public_client.get_collateral())
+
+# ================================================================
+# Market - Public market data.
+# ================================================================
+# Get all markets
 print(public_client.get_markets())
 
-# get ticker
+# Get specific market
+print(public_client.get_market('SOL_USDC'))
+
+# Get ticker for a specific market
 print(public_client.get_ticker('SOL_USDC'))
 
-# get tickers
+# Get tickers for all markets
 print(public_client.get_tickers())
 
-# get order book depth
-print(public_client.get_order_book_depth('SOL_USDC'))
+# Get order book depth for a specific market
+print(public_client.get_depth('SOL_USDC'))
 
-# get klines
+# Get K-Lines for a specific market
 print(public_client.get_klines('SOL_USDC', '1m'))
 
-# get status
+# Get mark price for a specific market
+print(public_client.get_mark_price('SOL_USDC'))
+
+# Get open interest for a specific market
+print(public_client.get_open_interest('SOL_USDC'))
+
+# Get funding interval rates for a specific market
+print(public_client.get_funding_interval_rates('SOL_USDC'))
+
+# ================================================================
+# System - Exchange system status.
+# ================================================================
+# Get system status
 print(public_client.get_status())
 
-# send ping
+# Send ping
 print(public_client.send_ping())
 
-# get system time
+# Get system time
 print(public_client.get_system_time())
 
-# get recent trades
+# ================================================================
+# Trades - Public trade data.
+# ================================================================
+# Get recent trades for a specific market
 print(public_client.get_recent_trades('SOL_USDC'))
 
-# get historical trades
+# Get historical trades for a specific market
 print(public_client.get_historical_trades('SOL_USDC', 10, 0))
