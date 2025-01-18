@@ -167,6 +167,22 @@ class Trade(BaseModel):
     isBuyerMaker: bool
 
 
+class Account(BaseModel):
+    autoBorrowSettlements: bool
+    autoLend: bool
+    autoRealizePnl: bool
+    autoRepayBorrows: bool
+    borrowLimit: str
+    futuresMakerFee: str
+    futuresTakerFee: str
+    leverageLimit: str
+    limitOrders: int
+    liquidating: bool
+    positionLimit: str
+    spotMakerFee: str
+    spotTakerFee: str
+    triggerOrders: int
+
 class Balance(BaseModel):
     available: str
     locked: str
@@ -177,7 +193,7 @@ class Balances(RootModel):
     root: Dict[str, Balance]
 
 
-class CollateralAsset(BaseModel):
+class Collateral(BaseModel):
     symbol: str
     assetMarkPrice: str
     totalQuantity: str
@@ -191,11 +207,20 @@ class CollateralAsset(BaseModel):
     unsettledEquity: str
 
 
-class CollateralInfo(BaseModel):
-    symbol: str
-    imfFunction: CollateralFunction
-    mmfFunction: CollateralFunction
-    haircutFunction: HaircutFunction
+class CollateralAsset(RootModel):
+    assetsValue: str
+    borrowLiability: str
+    collateral: List[Collateral]
+    liabilitiesValue: str
+    marginFraction: Optional[str] = None
+    mmf: str
+    netEquity: str
+    netEquityAvailable: str
+    netEquityLocked: str
+    netExposureFutures: str
+    pnlUnrealized: str
+    subaccountId: Optional[int] = None
+    userId: int
 
 
 class Deposit(BaseModel):
@@ -334,3 +359,48 @@ class Order(BaseModel):
     status: str
     symbol: str
     triggerPrice: str = None
+
+
+class ImfMmfFunction(BaseModel):
+    type: str
+    base: str
+    factor: str
+
+
+class BorrowLendPosition(BaseModel):
+    cumulativeInterest: str
+    id: str
+    imf: str
+    imfFunction: ImfMmfFunction
+    markPrice: str
+    mmf: str
+    mmfFunction: ImfMmfFunction
+    netQuantity: str
+    netExposureQuantity: str
+    netExposureNotional: str
+    symbol: str
+
+
+class Position(BaseModel):
+    breakEvenPrice: str
+    entryPrice: str
+    estLiquidationPrice: str
+    imf: str
+    imfFunction: ImfMmfFunction
+    markPrice: str
+    mmf: str
+    mmfFunction: ImfMmfFunction
+    netCost: str
+    netQuantity: str
+    netExposureQuantity: str
+    netExposureNotional: str
+    pnlRealized: str
+    pnlUnrealized: str
+    cumulativeFundingPayment: str
+    subaccountId: Optional[int] = None
+    symbol: str
+    userId: int
+    positionId: str
+    cumulativeInterest: str
+
+

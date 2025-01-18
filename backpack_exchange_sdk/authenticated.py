@@ -4,7 +4,7 @@ import time
 import requests
 from cryptography.hazmat.primitives.asymmetric import ed25519
 from requests.exceptions import JSONDecodeError
-from backpack_exchange_sdk.models import Account, ApiError, Balances, CollateralInfo, Deposit, DepositAddress, Withdrawal, BorrowHistory, InterestHistory, BorrowPosition, Fill, FundingPayment, OrderHistory, PnlHistory, Settlement, Order
+from backpack_exchange_sdk.models import Account, ApiError, Balances, CollateralAsset, Deposit, DepositAddress, Withdrawal, BorrowHistory, InterestHistory, BorrowPosition, Fill, FundingPayment, OrderHistory, PnlHistory, Settlement, Order, BorrowLendPosition, Position
 from pydantic import ValidationError
 from typing import List
 
@@ -92,7 +92,7 @@ class AuthenticationClient:
                        autoLend: bool = None,
                        autoRealizePnl: bool = None,
                        autoRepayBorrows: bool = None,
-                       leverageLimit: str = None) -> Account:
+                       leverageLimit: str = None) -> None:
         """
         Update account settings.
         """
@@ -107,9 +107,33 @@ class AuthenticationClient:
             data['autoRepayBorrows'] = autoRepayBorrows
         if leverageLimit is not None:
             data['leverageLimit'] = leverageLimit
-        response_data = self._send_request(
+
+        self._send_request(
             'PATCH', 'api/v1/account', 'accountUpdate', data)
-        return Account(**response_data)
+
+    # ================================================================
+    # Borrow Lend - Borrowing and lending.
+    # ================================================================
+    def get_borrow_lend_positions(self) -> List[BorrowLendPosition]:
+        """
+        Retrieves all the open borrow lending positions for the account.
+        """
+        response_data = self._send_request(
+            'GET', 'api/v1/borrow-lend/positions', 'borrowLendPositionQuery')
+        return [BorrowLendPosition(**item) for item in response_data]
+
+    def execute_borrow_lend(self, quantity: str, side: str, symbol: str) -> None:
+        """
+        Execute a borrow or lend operation.
+        """
+        data = {
+            'quantity': quantity,
+            'side': side,
+            'symbol': symbol
+        }
+
+        self._send_request('POST', 'api/v1/borrow-lend',
+                           'borrowLendExecute', data)
 
     # ================================================================
     # Capital - Capital management.
@@ -123,7 +147,7 @@ class AuthenticationClient:
             'GET', 'api/v1/capital', 'balanceQuery')
         return Balances(__root__=response_data)
 
-    def get_collateral(self, subAccountId: int = None) -> CollateralInfo:
+    def get_collateral(self, subAccountId: int = None) -> CollateralAsset:
         """
         Retrieves collateral information for an account.
         """
@@ -132,7 +156,7 @@ class AuthenticationClient:
             params['subaccountId'] = subAccountId
         response_data = self._send_request(
             'GET', 'api/v1/capital/collateral', 'collateralQuery', params)
-        return CollateralInfo(**response_data)
+        return CollateralAsset(**response_data)
 
     def get_deposits(self, fromTimestamp: int = None, toTimestamp: int = None, limit: int = 100, offset: int = 0) -> List[Deposit]:
         """
@@ -201,6 +225,17 @@ class AuthenticationClient:
         response_data = self._send_request(
             'POST', 'wapi/v1/capital/withdrawals', 'withdraw', data)
         return Withdrawal(**response_data)
+
+    # ================================================================
+    # Futures - Futures data.
+    # ================================================================
+    def get_open_positions(self) -> List[Position]:
+        """
+        Retrieves account position summary.
+        """
+        response_data = self._send_request(
+            'GET', 'api/v1/futures/positions', 'positionQuery')
+        return [Position(**item) for item in response_data]
 
     # ================================================================
     # History - Historical account data.
