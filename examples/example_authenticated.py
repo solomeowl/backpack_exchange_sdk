@@ -1,7 +1,8 @@
 from backpack_exchange_sdk.authenticated import AuthenticationClient
 from enums import RequestEnums
 
-client = AuthenticationClient('public_key', 'secret_key')
+client = AuthenticationClient('fyuQCoWg9Q80oHCkuXeRFaet/wS79oJu+6dnSubUhqc=',
+                              'CpcDiguRlLdezVMxML4cCB2hiisz5pgmNeV3t7FmIfI=')
 
 # ================================================================
 # Account - Account settings.
