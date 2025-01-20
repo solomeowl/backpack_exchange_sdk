@@ -1,8 +1,4 @@
 import requests
-from typing import List, Optional
-from .models import Asset, ApiError, CollateralInfo, Market, Ticker, Depth, Kline, MarkPrice, OpenInterest, FundingRate, SystemStatus, Trade  # 匯入模型
-from pydantic import ValidationError
-
 
 class PublicClient:
     def __init__(self):
@@ -21,64 +17,58 @@ class PublicClient:
                 return response.text
         else:
             try:
-                error = ApiError(**response.json())
-                raise Exception(f"API Error: {error.code} - {error.message}")
-            except (ValueError, ValidationError):
+                error = response.json()
+                raise Exception(f"API Error: {error.get(
+                    'code')} - {error.get('message')}")
+            except ValueError:
                 raise Exception(f"HTTP Error {response.status_code}: {response.text}")
 
-    def get_assets(self) -> List[Asset]:
+    def get_assets(self):
         """
         Retrieves all the assets that are supported by the exchange.
         """
-        response_data = self._get('api/v1/assets')
-        return [Asset(**item) for item in response_data]
+        return self._get('api/v1/assets')
 
-    def get_collateral(self) -> List[CollateralInfo]:
+    def get_collateral(self):
         """
         Get collateral parameters for assets.
         """
-        response_data = self._get('api/v1/collateral')
-        return [CollateralInfo(**item) for item in response_data]
+        return self._get('api/v1/collateral')
 
     # ================================================================
     # Market - Public market data.
     # ================================================================
-    def get_markets(self) -> List[Market]:
+    def get_markets(self):
         """
         Retrieves all the markets that are supported by the exchange.
         """
-        response_data = self._get("api/v1/markets")
-        return [Market(**item) for item in response_data]
+        return self._get("api/v1/markets")
 
-    def get_market(self, symbol: str) -> Market:
+    def get_market(self, symbol: str):
         """
         Retrieves a market supported by the exchange.
         """
-        response_data = self._get('api/v1/market', params={'symbol': symbol})
-        return Market(**response_data)
+        return self._get('api/v1/market', params={'symbol': symbol})
 
-    def get_ticker(self, symbol: str) -> Ticker:
+    def get_ticker(self, symbol: str):
         """
         Retrieves summarised statistics for the last 24 hours for the given market symbol.
         """
-        response_data = self._get('api/v1/ticker', params={'symbol': symbol})
-        return Ticker(**response_data)
+        return self._get('api/v1/ticker', params={'symbol': symbol})
 
-    def get_tickers(self) -> List[Ticker]:
+    def get_tickers(self):
         """
         Retrieves summarised statistics for the last 24 hours for all market symbols.
         """
-        response_data = self._get('api/v1/tickers')
-        return [Ticker(**item) for item in response_data]
+        return self._get('api/v1/tickers')
 
-    def get_depth(self, symbol: str) -> Depth:
+    def get_depth(self, symbol: str):
         """
         Retrieves the order book depth for a given market symbol.
         """
-        response_data = self._get('api/v1/depth', params={'symbol': symbol})
-        return Depth(**response_data)
+        return self._get('api/v1/depth', params={'symbol': symbol})
 
-    def get_klines(self, symbol: str, interval: str, start_time: int, end_time: int = None) -> List[Kline]:
+    def get_klines(self, symbol: str, interval: str, start_time: int, end_time: int = None):
         """
         Get K-Lines for the given market symbol, providing a startTime and optionally an endTime.
         If no endTime is provided, the current time will be used.
@@ -87,44 +77,36 @@ class PublicClient:
                   'startTime': start_time}
         if end_time is not None:
             params['endTime'] = end_time
-        response_data = self._get('api/v1/klines', params=params)
-        return [Kline(**item) for item in response_data]
+        return self._get('api/v1/klines', params=params)
 
-    def get_mark_price(self, symbol: str) -> MarkPrice:
+    def get_mark_price(self, symbol: str):
         """
         Retrieves mark price, index price and funding rate for the given market symbol.
         """
-        response_data = self._get(
-            'api/v1/markPrice', params={'symbol': symbol})
-        return MarkPrice(**response_data)
+        return self._get('api/v1/markPrice', params={'symbol': symbol})
 
-    def get_open_interest(self, symbol: str) -> OpenInterest:
+    def get_open_interest(self, symbol: str):
         """
         Retrieves the current open interest for the given market.
         """
-        response_data = self._get(
-            'api/v1/openInterest', params={'symbol': symbol})
-        return OpenInterest(**response_data)
+        return self._get('api/v1/openInterest', params={'symbol': symbol})
 
-    def get_funding_interval_rates(self, symbol: str, limit: int = 100, offset: int = 0) -> List[FundingRate]:
+    def get_funding_interval_rates(self, symbol: str, limit: int = 100, offset: int = 0):
         """
         Funding interval rate history for futures.
         """
         params = {'symbol': symbol, 'limit': limit, 'offset': offset}
-        response_data = self._get('api/v1/fundingRates', params=params)
-        return [FundingRate(**item) for item in response_data]
-
+        return self._get('api/v1/fundingRates', params=params)
 
     # ================================================================
     # System - Exchange system status.
     # ================================================================
 
-    def get_status(self) -> SystemStatus:
+    def get_status(self):
         """
         Get the system status, and the status message, if any.
         """
-        response_data = self._get('api/v1/status')
-        return SystemStatus(**response_data)
+        return self._get('api/v1/status')
 
     def send_ping(self) -> str:
         """
@@ -141,21 +123,19 @@ class PublicClient:
     # ================================================================
     # Trades - Public trade data.
     # ================================================================
-    def get_recent_trades(self, symbol: str, limit: int = 100) -> List[Trade]:
+    def get_recent_trades(self, symbol: str, limit: int = 100):
         """
         Retrieve the most recent trades for a symbol. This is public data and is not specific to any account.
         The maximum available recent trades is 1000. If you need more than 1000 trades use the historical trades
         endpoint.
         """
         params = {'symbol': symbol, 'limit': limit}
-        response_data = self._get('api/v1/trades', params=params)
-        return [Trade(**item) for item in response_data]
+        return self._get('api/v1/trades', params=params)
 
-    def get_historical_trades(self, symbol: str, limit: int = 100, offset: int = 0) -> List[Trade]:
+    def get_historical_trades(self, symbol: str, limit: int = 100, offset: int = 0):
         """
         Retrieves all historical trades for the given symbol. This is public trade data and is not specific to any
         account.
         """
         params = {'symbol': symbol, 'limit': limit, 'offset': offset}
-        response_data = self._get('api/v1/trades/history', params=params)
-        return [Trade(**item) for item in response_data]
+        return self._get('api/v1/trades/history', params=params)

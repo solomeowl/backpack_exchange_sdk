@@ -1,7 +1,6 @@
 from backpack_exchange_sdk.authenticated import AuthenticationClient
 from enums import RequestEnums
-
-client = AuthenticationClient('public_key', 'secret_key')
+client = AuthenticationClient('api_key', 'secret_key')
 
 # ================================================================
 # Account - Account settings.
@@ -10,7 +9,7 @@ client = AuthenticationClient('public_key', 'secret_key')
 print(client.get_account())
 
 # Update account settings
-print(client.update_account(autoBorrowSettlements=True, leverageLimit="5"))
+print(client.update_account(autoBorrowSettlements=False, leverageLimit="5"))
 
 # ================================================================
 # Capital - Capital management.
