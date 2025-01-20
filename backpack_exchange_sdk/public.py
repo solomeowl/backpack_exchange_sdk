@@ -83,7 +83,7 @@ class PublicClient:
         """
         Retrieves mark price, index price and funding rate for the given market symbol.
         """
-        return self._get('api/v1/markPrice', params={'symbol': symbol})
+        return self._get('api/v1/markPrices', params={'symbol': symbol})
 
     def get_open_interest(self, symbol: str):
         """
