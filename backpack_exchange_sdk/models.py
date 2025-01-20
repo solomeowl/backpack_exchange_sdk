@@ -207,7 +207,7 @@ class Collateral(BaseModel):
     unsettledEquity: str
 
 
-class CollateralAsset(RootModel):
+class CollateralAsset(BaseModel):
     assetsValue: str
     borrowLiability: str
     collateral: List[Collateral]
