@@ -31,19 +31,19 @@ print(public_client.get_depth('SOL_USDC'))
 print(public_client.get_klines('SOL_USDC', '1m', int(time.time())))
 
 # Get mark price for a specific market
-# print(public_client.get_mark_price('SOL_USDC'))
+print(public_client.get_mark_price('SOL_USDC_PERP'))
 
 # Get open interest for a specific market
-# print(public_client.get_open_interest('SOL_USDC'))
+print(public_client.get_open_interest('SOL_USDC_PERP'))
 
 # Get funding interval rates for a specific market
-print(public_client.get_funding_interval_rates('SOL_USDC'))
+print(public_client.get_funding_interval_rates('SOL_USDC_PERP'))
 
 # ================================================================
 # System - Exchange system status.
 # ================================================================
 # Get system status
-# print(public_client.get_status())
+print(public_client.get_status())
 
 # Send ping
 print(public_client.send_ping())

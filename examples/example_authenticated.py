@@ -52,9 +52,11 @@ print(client.get_settlement_history())
 # Order - Order management.
 # ================================================================
 print(client.execute_order(RequestEnums.OrderType.LIMIT.value, RequestEnums.Side.ASK.value,
-                           "SOL_USDC", True, 200, "0.1"))
+                           "SOL_USDC", postOnly=True, clientId=12345, price="200", quantity="0.1",
+                           timeInForce=RequestEnums.TimeInForce.GTC.value, selfTradePrevention="decrementAndCancel"))
 print(client.execute_order(RequestEnums.OrderType.LIMIT.value, RequestEnums.Side.BID.value,
-                           "SOL_USDC", timeInForce=RequestEnums.TimeInForce.IOC.value))
+                           "SOL_USDC", postOnly=False, clientId=67890, price="195", quantity="0.2",
+                           timeInForce=RequestEnums.TimeInForce.IOC.value, reduceOnly=True))
 print(client.get_users_open_orders('SOL_USDC', 9999))
 print(client.cancel_open_orders('SOL_USDC'))
 print(client.get_open_orders('SOL_USDC'))
