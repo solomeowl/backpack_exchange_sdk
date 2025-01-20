@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="backpack_exchange_sdk",
-    version="1.0.22",
+    version="1.0.23",
     author="solomeowl",
     author_email="j19940430@gmail.com",
     description="A simple SDK for backpack exchange",
@@ -16,7 +16,6 @@ setup(
     packages=find_packages(exclude=["tests"]),
     install_requires=[
         "requests",
-        "pydantic",
         "cryptography",
     ],
 )
