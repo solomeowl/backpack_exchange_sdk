@@ -25,10 +25,10 @@ class OrderType(Enum):
 
 
 class BorrowLendEventType(Enum):
-   BORROW = "Borrow"
-   BORROW_REPAY = "BorrowRepay"
-   LEND = "Lend"
-   LEND_REDEEM = "LendRedeem"
+    BORROW = "Borrow"
+    BORROW_REPAY = "BorrowRepay"
+    LEND = "Lend"
+    LEND_REDEEM = "LendRedeem"
 
 
 class InterestPaymentSource(Enum):
