@@ -1,6 +1,7 @@
 from backpack_exchange_sdk.authenticated import AuthenticationClient
 from enums import RequestEnums
-client = AuthenticationClient('api_key', 'secret_key')
+
+client = AuthenticationClient("api_key", "secret_key")
 
 # ================================================================
 # Account - Account settings.
@@ -16,10 +17,9 @@ print(client.update_account(autoBorrowSettlements=False, leverageLimit="5"))
 # ================================================================
 print(client.get_balances())
 print(client.get_deposits())
-print(client.get_deposit_address('Solana'))
+print(client.get_deposit_address("Solana"))
 print(client.get_withdrawals())
-print(client.request_withdrawal('xxxxxxxxxx',
-      'Solana', '0.1', 'SOL', None, "999999"))
+print(client.request_withdrawal("xxxxxxxxxx", "Solana", "0.1", "SOL", None, "999999"))
 
 # Get collateral information
 print(client.get_collateral())
@@ -27,8 +27,8 @@ print(client.get_collateral())
 # ================================================================
 # History - Historical account data.
 # ================================================================
-print(client.get_order_history(symbol='SOL_USDC'))
-print(client.get_fill_history(symbol='SOL_USDC'))
+print(client.get_order_history(symbol="SOL_USDC"))
+print(client.get_fill_history(symbol="SOL_USDC"))
 
 # Get borrow history
 print(client.get_borrow_history())
@@ -51,19 +51,39 @@ print(client.get_settlement_history())
 # ================================================================
 # Order - Order management.
 # ================================================================
-print(client.execute_order(RequestEnums.OrderType.LIMIT.value, RequestEnums.Side.ASK.value,
-                           "SOL_USDC", postOnly=True, clientId=12345, price="200", quantity="0.1",
-                           timeInForce=RequestEnums.TimeInForce.GTC.value, selfTradePrevention="decrementAndCancel"))
-print(client.execute_order(RequestEnums.OrderType.LIMIT.value, RequestEnums.Side.BID.value,
-                           "SOL_USDC", postOnly=False, clientId=67890, price="195", quantity="0.2",
-                           timeInForce=RequestEnums.TimeInForce.IOC.value, reduceOnly=True))
-print(client.get_users_open_orders('SOL_USDC', 9999))
-print(client.cancel_open_orders('SOL_USDC'))
-print(client.get_open_orders('SOL_USDC'))
-print(client.cancel_open_orders('SOL_USDC'))
+print(
+    client.execute_order(
+        RequestEnums.OrderType.LIMIT.value,
+        RequestEnums.Side.ASK.value,
+        "SOL_USDC",
+        postOnly=True,
+        clientId=12345,
+        price="200",
+        quantity="0.1",
+        timeInForce=RequestEnums.TimeInForce.GTC.value,
+        selfTradePrevention="decrementAndCancel",
+    )
+)
+print(
+    client.execute_order(
+        RequestEnums.OrderType.LIMIT.value,
+        RequestEnums.Side.BID.value,
+        "SOL_USDC",
+        postOnly=False,
+        clientId=67890,
+        price="195",
+        quantity="0.2",
+        timeInForce=RequestEnums.TimeInForce.IOC.value,
+        reduceOnly=True,
+    )
+)
+print(client.get_users_open_orders("SOL_USDC", 9999))
+print(client.cancel_open_orders("SOL_USDC"))
+print(client.get_open_orders("SOL_USDC"))
+print(client.cancel_open_orders("SOL_USDC"))
 
 # Cancel a specific open order
-print(client.cancel_open_order('SOL_USDC', orderId='123456'))
+print(client.cancel_open_order("SOL_USDC", orderId="123456"))
 
 # ================================================================
 # Borrow Lend - Borrowing and lending.
