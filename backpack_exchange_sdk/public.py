@@ -19,8 +19,7 @@ class PublicClient:
         else:
             try:
                 error = response.json()
-                raise Exception(f"API Error: {error.get(
-                    'code')} - {error.get('message')}")
+                raise Exception(f"API Error: {error.get('code')} - {error.get('message')}")
             except ValueError:
                 raise Exception(f"HTTP Error {response.status_code}: {response.text}")
 
