@@ -3,9 +3,10 @@ import requests
 class PublicClient:
     def __init__(self):
         self.base_url = 'https://api.backpack.exchange/'
+        self.session = requests.session()
 
     def _get(self, endpoint, params=None):
-        response = requests.get(url=f'{self.base_url}{endpoint}', params=params)
+        response = self.session.get(url=f'{self.base_url}{endpoint}', params=params)
 
         if 200 <= response.status_code < 300:
             if response.status_code == 204:

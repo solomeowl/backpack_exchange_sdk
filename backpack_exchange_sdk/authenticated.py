@@ -17,6 +17,7 @@ class AuthenticationClient:
             base64.b64decode(secret_key)
         )
         self.window = window
+        self.session = requests.session()
 
     def _send_request(self, method, endpoint, action, params=None):
         """
@@ -28,12 +29,12 @@ class AuthenticationClient:
 
         try:
             if method == 'GET':
-                response = requests.get(url, headers=headers, params=params)
+                response = self.session.get(url, headers=headers, params=params)
             elif method == 'DELETE':
-                response = requests.delete(
+                response = self.session.delete(
                     url, headers=headers, data=json.dumps(params))
             else:
-                response = requests.post(
+                response = self.session.post(
                     url, headers=headers, data=json.dumps(params))
 
             if 200 <= response.status_code < 300:
