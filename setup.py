@@ -2,7 +2,11 @@ from setuptools import find_packages, setup
 
 setup(
     name="backpack_exchange_sdk",
+<<<<<<< HEAD
+    version="1.0.26",
+=======
     version="1.0.25",
+>>>>>>> main
     author="solomeowl",
     author_email="j19940430@gmail.com",
     description="A simple SDK for backpack exchange",
@@ -16,6 +20,7 @@ setup(
     install_requires=[
         "requests>=2.31.0",
         "cryptography>=42.0.5",
+        "websocket-client>=1.7.0",
     ],
     extras_require={
         "dev": [

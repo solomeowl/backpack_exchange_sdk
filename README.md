@@ -1,13 +1,13 @@
 # Backpack Exchange SDK
 ![PyPI - Version](https://img.shields.io/pypi/v/backpack-exchange-sdk?)
 
-
-The Backpack Exchange SDK provides a convenient interface for interacting with the Backpack Exchange API. It includes two main clients: `AuthenticationClient` for authenticated endpoints and `PublicClient` for public endpoints.
+The Backpack Exchange SDK provides a convenient interface for interacting with the Backpack Exchange API. It includes three main clients: `AuthenticationClient` for authenticated endpoints, `PublicClient` for public endpoints, and `WebSocketClient` for real-time data streaming.
 
 ## Features
 
 - **Authentication Client**: Interact with authenticated endpoints for managing capital, historical data, and orders.
 - **Public Client**: Access public market data, system status, and public trade data.
+- **WebSocket Client**: Stream real-time market data and account updates.
 
 ## Installation
 
@@ -39,8 +39,8 @@ print(balances)
 # Request a withdrawal
 response = client.request_withdrawal('xxxxaddress', 'Solana', '0,1', 'Sol')
 print(response)
-
 ```
+
 ### Public Client
 ```python
 from backpack_exchange_sdk.public import PublicClient
@@ -54,7 +54,63 @@ print(assets)
 # Get ticker information for a specific symbol
 ticker = public_client.get_ticker('SOL_USDC')
 print(ticker)
+```
 
+### WebSocket Client
+```python
+from backpack_exchange_sdk.websocket import WebSocketClient
+from datetime import datetime
+
+# Initialize WebSocket client
+ws_client = WebSocketClient()  # For public streams only
+# ws_client = WebSocketClient(api_key='<YOUR_API_KEY>', secret_key='<YOUR_SECRET>')  # For private streams
+
+# Define callback functions
+def handle_book_ticker(data):
+    """Handle book ticker updates"""
+    print("\n=== Book Ticker Update ===")
+    print(f"Symbol: {data['s']}")
+    print(f"Best Ask: {data['a']} (Quantity: {data['A']})")
+    print(f"Best Bid: {data['b']} (Quantity: {data['B']})")
+    print(f"Time: {datetime.fromtimestamp(data['E']/1000000).strftime('%Y-%m-%d %H:%M:%S.%f')}")
+
+def handle_trades(data):
+    """Handle trade updates"""
+    print("\n=== Trade Update ===")
+    print(f"Symbol: {data['s']}")
+    print(f"Price: {data['p']}")
+    print(f"Quantity: {data['q']}")
+    print(f"Trade Type: {'Maker' if data['m'] else 'Taker'}")
+    print(f"Trade ID: {data['t']}")
+
+def handle_kline(data):
+    """Handle kline/candlestick updates"""
+    print("\n=== Kline Update ===")
+    print(f"Symbol: {data['s']}")
+    print(f"Open: {data['o']}")
+    print(f"High: {data['h']}")
+    print(f"Low: {data['l']}")
+    print(f"Close: {data['c']}")
+    print(f"Volume: {data['v']}")
+    print(f"Closed: {data['X']}")
+
+# Subscribe to public streams
+ws_client.subscribe(
+    streams=["bookTicker.SOL_USDC"],  # Book ticker stream
+    callback=handle_book_ticker
+)
+
+# Subscribe to private streams (requires authentication)
+ws_client.subscribe(
+    streams=["account.orderUpdate.SOL_USDC"],  # Order updates stream
+    callback=handle_trades,
+    is_private=True
+)
+
+# Keep the connection alive
+import time
+while True:
+    time.sleep(1)
 ```
 
 ## Documentation
