@@ -23,6 +23,7 @@ class WebSocketClient:
         self.base_url = "wss://ws.backpack.exchange"
         self.callbacks: Dict[str, List[Callable]] = {}
         self.connected = threading.Event()
+        self.last_pong = time.time()
         self._connect()
         # Wait for connection to be established
         if not self.connected.wait(timeout=10):
@@ -50,10 +51,19 @@ class WebSocketClient:
             self.connected.clear()
 
         def on_close(ws, close_status_code, close_msg):
-            """Handle WebSocket connection closure and implement reconnection"""
-            print("WebSocket connection closed")
+            """
+            Handle connection closure
+            If server is shutting down (status 1001), wait 30s before reconnecting
+            """
+            print(f"WebSocket connection closed: {close_status_code} - {close_msg}")
             self.connected.clear()
-            time.sleep(5)  # Wait before reconnecting
+
+            if close_status_code == 1001:  # Server shutting down
+                print("Server shutting down, waiting 30s before reconnecting...")
+                time.sleep(30)  # Wait for grace period
+            else:
+                time.sleep(5)  # Normal reconnection delay
+
             self._connect()
 
         def on_open(ws):
@@ -61,9 +71,17 @@ class WebSocketClient:
             print("WebSocket connection established")
             self.connected.set()
             
+        def on_pong(ws, message):
+            """Update last pong time"""
+            self.last_pong = time.time()
+
         def on_ping(ws, message):
-            """Respond to ping messages to maintain connection"""
-            ws.send_pong(message)
+            """
+            Handle ping from server by responding with pong immediately
+            Server sends ping every 60s and expects pong within 120s
+            """
+            if hasattr(ws, 'sock') and ws.sock:
+                ws.sock.pong(message)
 
         # Initialize WebSocket connection with handlers
         self.ws = websocket.WebSocketApp(
@@ -72,10 +90,12 @@ class WebSocketClient:
             on_error=on_error,
             on_close=on_close,
             on_open=on_open,
-            on_ping=on_ping
+            on_ping=on_ping,
+            on_pong=on_pong
         )
 
         # Start WebSocket connection in a separate thread
+        # No need for ping_interval as server handles pinging
         wst = threading.Thread(target=self.ws.run_forever)
         wst.daemon = True
         wst.start()
@@ -168,6 +188,7 @@ class WebSocketClient:
                 del self.callbacks[stream]
 
     def close(self):
-        """Close the WebSocket connection"""
+        """Gracefully close the WebSocket connection"""
         if self.ws:
-            self.ws.close() 
+            self.ws.close()
+            self.connected.clear()
