@@ -83,17 +83,6 @@ def handle_trades(data):
     print(f"Trade Type: {'Maker' if data['m'] else 'Taker'}")
     print(f"Trade ID: {data['t']}")
 
-def handle_kline(data):
-    """Handle kline/candlestick updates"""
-    print("\n=== Kline Update ===")
-    print(f"Symbol: {data['s']}")
-    print(f"Open: {data['o']}")
-    print(f"High: {data['h']}")
-    print(f"Low: {data['l']}")
-    print(f"Close: {data['c']}")
-    print(f"Volume: {data['v']}")
-    print(f"Closed: {data['X']}")
-
 # Subscribe to public streams
 ws_client.subscribe(
     streams=["bookTicker.SOL_USDC"],  # Book ticker stream
