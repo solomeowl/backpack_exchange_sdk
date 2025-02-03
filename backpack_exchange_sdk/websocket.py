@@ -22,7 +22,11 @@ class WebSocketClient:
         self.secret_key = secret_key
         self.base_url = "wss://ws.backpack.exchange"
         self.callbacks: Dict[str, List[Callable]] = {}
+        self.connected = threading.Event()
         self._connect()
+        # Wait for connection to be established
+        if not self.connected.wait(timeout=10):
+            raise Exception("WebSocket connection timeout")
 
     def _connect(self):
         """
@@ -43,16 +47,19 @@ class WebSocketClient:
         def on_error(ws, error):
             """Handle WebSocket errors"""
             print(f"WebSocket error: {error}")
+            self.connected.clear()
 
         def on_close(ws, close_status_code, close_msg):
             """Handle WebSocket connection closure and implement reconnection"""
             print("WebSocket connection closed")
+            self.connected.clear()
             time.sleep(5)  # Wait before reconnecting
             self._connect()
 
         def on_open(ws):
             """Handle WebSocket connection establishment"""
             print("WebSocket connection established")
+            self.connected.set()
             
         def on_ping(ws, message):
             """Respond to ping messages to maintain connection"""
@@ -107,6 +114,11 @@ class WebSocketClient:
             callback (Callable): Function to handle incoming messages
             is_private (bool): Whether these are private authenticated streams
         """
+        # Wait for connection to be established
+        if not self.connected.is_set():
+            if not self.connected.wait(timeout=10):
+                raise Exception("WebSocket connection not available")
+
         # Register callbacks for each stream
         for stream in streams:
             if stream not in self.callbacks:
@@ -131,7 +143,11 @@ class WebSocketClient:
             ]
 
         # Send subscription request
-        self.ws.send(json.dumps(subscribe_data))
+        try:
+            self.ws.send(json.dumps(subscribe_data))
+        except Exception as e:
+            print(f"Error subscribing to streams: {e}")
+            raise
 
     def unsubscribe(self, streams: List[str]):
         """
