@@ -1,6 +1,7 @@
 from backpack_exchange_sdk.websocket import WebSocketClient
 import time
 from datetime import datetime
+import json
 
 
 def handle_book_ticker(data):
@@ -24,14 +25,34 @@ def handle_trades(data):
 
 def handle_kline(data):
     """Handle kline/candlestick updates"""
-    print("\n=== Kline Update ===")
-    print(f"Symbol: {data['s']}")
-    print(f"Open: {data['o']}")
-    print(f"High: {data['h']}")
-    print(f"Low: {data['l']}")
-    print(f"Close: {data['c']}")
-    print(f"Volume: {data['v']}")
-    print(f"Closed: {data['X']}")
+    try:
+        print("\n=== Kline Update ===")
+
+        # Handle Symbol information
+        if isinstance(data['s'], dict):
+            symbol_info = data['s']
+            print("Symbol Info:")
+            print(f"  Base Asset: {symbol_info['base_asset']}")
+            print(f"  Quote Asset: {symbol_info['quote_asset']}")
+            print(f"  Market Type: {symbol_info['market_type']}")
+
+        # Handle timestamps
+        print(f"Event Time: {data['E']}")  # Microsecond timestamp
+        print(f"Start Time: {data['t']}")  # ISO format time
+        print(f"End Time: {data['T']}")    # ISO format time
+
+        # Handle price and trading data
+        print(f"Open: {data['o']}")
+        print(f"High: {data['h']}")
+        print(f"Low: {data['l']}")
+        print(f"Close: {data['c']}")
+        print(f"Volume: {data['v']}")
+        print(f"Number of Trades: {data['n']}")
+        print(f"Is Closed: {data['X']}")
+
+    except Exception as e:
+        print(f"Error processing kline data: {str(e)}")
+        print(f"Raw data: {data}")
 
 
 def handle_depth(data):
@@ -120,12 +141,12 @@ def main():
     # Register handlers for different stream types
     stream_handlers = {
         "bookTicker.SOL_USDC": handle_book_ticker,
-        "trade.SOL_USDC": handle_trades,
-        "kline.1m.SOL_USDC": handle_kline,
-        "depth.SOL_USDC": handle_depth,
-        "markPrice.SOL_USDC": handle_mark_price,
-        "ticker.SOL_USDC": handle_ticker,
-        "liquidation": handle_liquidation
+        # "trade.SOL_USDC": handle_trades,
+        # "kline.1m.SOL_USDC": handle_kline,
+        # "depth.SOL_USDC": handle_depth,
+        # "markPrice.SOL_USDC": handle_mark_price,
+        # "ticker.SOL_USDC": handle_ticker,
+        # "liquidation": handle_liquidation
     }
 
     # Subscribe to public streams with their respective handlers
@@ -133,16 +154,16 @@ def main():
         ws_client.subscribe([stream], handler)
 
     # Subscribe to private streams
-    ws_client.subscribe(
-        ["account.orderUpdate.SOL_USDC"],
-        handle_order_update,
-        is_private=True
-    )
-    ws_client.subscribe(
-        ["account.positionUpdate.SOL_USDC"],
-        handle_position_update,
-        is_private=True
-    )
+    # ws_client.subscribe(
+    #     ["account.orderUpdate.SOL_USDC"],
+    #     handle_order_update,
+    #     is_private=True
+    # )
+    # ws_client.subscribe(
+    #     ["account.positionUpdate.SOL_USDC"],
+    #     handle_position_update,
+    #     is_private=True
+    # )
 
     print("WebSocket connection established")
     print("Press Ctrl+C to exit")
