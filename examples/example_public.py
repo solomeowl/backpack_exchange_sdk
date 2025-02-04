@@ -4,6 +4,9 @@ from backpack_exchange_sdk.public import PublicClient
 
 public_client = PublicClient()
 
+# ================================================================
+# Assets - Assets and collateral data.
+# ================================================================
 # Get assets
 print(public_client.get_assets())
 
@@ -60,3 +63,15 @@ print(public_client.get_recent_trades("SOL_USDC_PERP"))
 
 # Get historical trades for a specific market
 print(public_client.get_historical_trades("SOL_USDC_PERP", 10, 0))
+
+# ================================================================
+# Borrow Lend Markets - Borrowing and lending data.
+# ================================================================
+# Get all borrow lend markets information
+print(public_client.get_borrow_lend_markets())
+
+# Get borrow lend market history for a specific interval
+print(public_client.get_borrow_lend_market_history(interval="1d"))
+
+# Get borrow lend market history for a specific symbol and interval
+print(public_client.get_borrow_lend_market_history(interval="1w", symbol="SOL"))
