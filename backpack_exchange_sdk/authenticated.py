@@ -209,7 +209,7 @@ class AuthenticationClient:
         """
         Retrieves account position summary.
         """
-        return self._send_request("GET", "api/v1/futures/positions", "positionQuery")
+        return self._send_request("GET", "api/v1/position", "positionQuery")
 
     # ================================================================
     # History - Historical account data.
