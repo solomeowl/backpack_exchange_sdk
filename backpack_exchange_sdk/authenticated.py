@@ -51,9 +51,11 @@ class AuthenticationClient:
 
     def _generate_signature(self, action: str, timestamp: int, params=None):
         if params:
-            if "postOnly" in params:
-                params = params.copy()
-                params["postOnly"] = str(params["postOnly"]).lower()
+            params = params.copy()
+            for key, value in params.items():
+                if isinstance(value, bool):
+                    params[key] = str(value).lower()
+
             param_str = "&" + "&".join(f"{k}={v}" for k, v in sorted(params.items()))
         else:
             param_str = ""
@@ -79,12 +81,12 @@ class AuthenticationClient:
         return self._send_request("GET", "api/v1/account", "accountQuery")
 
     def update_account(
-        self,
-        autoBorrowSettlements: bool = None,
-        autoLend: bool = None,
-        autoRealizePnl: bool = None,
-        autoRepayBorrows: bool = None,
-        leverageLimit: str = None,
+            self,
+            autoBorrowSettlements: bool = None,
+            autoLend: bool = None,
+            autoRealizePnl: bool = None,
+            autoRepayBorrows: bool = None,
+            leverageLimit: str = None,
     ) -> None:
         """
         Update account settings.
@@ -169,15 +171,15 @@ class AuthenticationClient:
         return self._send_request("GET", "wapi/v1/capital/withdrawals", "withdrawalQueryAll", params)
 
     def request_withdrawal(
-        self,
-        address: str,
-        blockchain: str,
-        quantity: str,
-        symbol: str,
-        client_id: str = None,
-        two_factor_token: str = None,
-        auto_borrow: bool = None,
-        auto_lend_redeem: bool = None,
+            self,
+            address: str,
+            blockchain: str,
+            quantity: str,
+            symbol: str,
+            client_id: str = None,
+            two_factor_token: str = None,
+            auto_borrow: bool = None,
+            auto_lend_redeem: bool = None,
     ):
         """
         Requests a withdrawal from the exchange.
@@ -215,13 +217,13 @@ class AuthenticationClient:
     # History - Historical account data.
     # ================================================================
     def get_borrow_history(
-        self,
-        type: str = None,
-        sources: str = None,
-        positionId: str = None,
-        symbol: str = None,
-        limit: int = 100,
-        offset: int = 0,
+            self,
+            type: str = None,
+            sources: str = None,
+            positionId: str = None,
+            symbol: str = None,
+            limit: int = 100,
+            offset: int = 0,
     ):
         """
         History of borrow and lend operations for the account.
@@ -238,7 +240,7 @@ class AuthenticationClient:
         return self._send_request("GET", "wapi/v1/history/borrowLend", "borrowHistoryQueryAll", params)
 
     def get_interest_history(
-        self, symbol: str = None, positionId: str = None, limit: int = 100, offset: int = 0, sources: str = None
+            self, symbol: str = None, positionId: str = None, limit: int = 100, offset: int = 0, sources: str = None
     ):
         """
         History of the interest payments for borrows and lends for the account.
@@ -253,7 +255,7 @@ class AuthenticationClient:
         return self._send_request("GET", "wapi/v1/history/interest", "interestHistoryQueryAll", params)
 
     def get_borrow_position_history(
-        self, symbol: str = None, side: str = None, state: str = None, limit: int = 100, offset: int = 0
+            self, symbol: str = None, side: str = None, state: str = None, limit: int = 100, offset: int = 0
     ):
         """
         History of borrow and lend positions for the account.
@@ -270,14 +272,14 @@ class AuthenticationClient:
         )
 
     def get_fill_history(
-        self,
-        orderId: str = None,
-        fromTimestamp: int = None,
-        toTimestamp: int = None,
-        symbol: str = None,
-        limit: int = 100,
-        offset: int = 0,
-        fillType: str = None,
+            self,
+            orderId: str = None,
+            fromTimestamp: int = None,
+            toTimestamp: int = None,
+            symbol: str = None,
+            limit: int = 100,
+            offset: int = 0,
+            fillType: str = None,
     ):
         """
         Retrieves historical fills, with optional filtering for a specific order or symbol.
@@ -357,23 +359,23 @@ class AuthenticationClient:
         return self._send_request("GET", "api/v1/order", "orderQuery", params)
 
     def execute_order(
-        self,
-        orderType: str,
-        side: str,
-        symbol: str,
-        postOnly: bool = False,
-        clientId: int = None,
-        price: str = None,
-        quantity: str = None,
-        timeInForce: str = None,
-        quoteQuantity: str = None,
-        selfTradePrevention: str = None,
-        triggerPrice: str = None,
-        reduceOnly: bool = None,
-        autoBorrow: bool = None,
-        autoBorrowRepay: bool = None,
-        autoLend: bool = None,
-        autoLendRedeem: bool = None,
+            self,
+            orderType: str,
+            side: str,
+            symbol: str,
+            postOnly: bool = False,
+            clientId: int = None,
+            price: str = None,
+            quantity: str = None,
+            timeInForce: str = None,
+            quoteQuantity: str = None,
+            selfTradePrevention: str = None,
+            triggerPrice: str = None,
+            reduceOnly: bool = None,
+            autoBorrow: bool = None,
+            autoBorrowRepay: bool = None,
+            autoLend: bool = None,
+            autoLendRedeem: bool = None,
     ):
         """
         Executes an order on the order book. If the order is not immediately filled,
