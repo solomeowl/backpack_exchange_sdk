@@ -1,7 +1,8 @@
-from backpack_exchange_sdk.websocket import WebSocketClient
+import json
 import time
 from datetime import datetime
-import json
+
+from backpack_exchange_sdk.websocket import WebSocketClient
 
 
 def handle_book_ticker(data):
@@ -29,8 +30,8 @@ def handle_kline(data):
         print("\n=== Kline Update ===")
 
         # Handle Symbol information
-        if isinstance(data['s'], dict):
-            symbol_info = data['s']
+        if isinstance(data["s"], dict):
+            symbol_info = data["s"]
             print("Symbol Info:")
             print(f"  Base Asset: {symbol_info['base_asset']}")
             print(f"  Quote Asset: {symbol_info['quote_asset']}")
@@ -39,7 +40,7 @@ def handle_kline(data):
         # Handle timestamps
         print(f"Event Time: {data['E']}")  # Microsecond timestamp
         print(f"Start Time: {data['t']}")  # ISO format time
-        print(f"End Time: {data['T']}")    # ISO format time
+        print(f"End Time: {data['T']}")  # ISO format time
 
         # Handle price and trading data
         print(f"Open: {data['o']}")
@@ -59,8 +60,8 @@ def handle_depth(data):
     """Handle order book depth updates"""
     print("\n=== Depth Update ===")
     print(f"Symbol: {data['s']}")
-    print("Asks:", data['a'])
-    print("Bids:", data['b'])
+    print("Asks:", data["a"])
+    print("Bids:", data["b"])
     print(f"Update ID: {data['u']}")
 
 
@@ -99,9 +100,9 @@ def handle_order_update(data):
     print(f"Symbol: {data['s']}")
     print(f"Order ID: {data['i']}")
     print(f"Status: {data['X']}")
-    if 'p' in data:
+    if "p" in data:
         print(f"Price: {data['p']}")
-    if 'q' in data:
+    if "q" in data:
         print(f"Quantity: {data['q']}")
 
 
@@ -123,19 +124,19 @@ def main():
 
     # Subscribe to public streams
     public_streams = [
-        "bookTicker.SOL_USDC",      # Book ticker
-        "trade.SOL_USDC",           # Trades
-        "kline.1m.SOL_USDC",        # 1-minute kline
-        "depth.SOL_USDC",           # Order book depth
-        "markPrice.SOL_USDC",       # Mark price
-        "ticker.SOL_USDC",          # 24hr ticker
-        "liquidation"               # Liquidation events
+        "bookTicker.SOL_USDC",  # Book ticker
+        "trade.SOL_USDC",  # Trades
+        "kline.1m.SOL_USDC",  # 1-minute kline
+        "depth.SOL_USDC",  # Order book depth
+        "markPrice.SOL_USDC",  # Mark price
+        "ticker.SOL_USDC",  # 24hr ticker
+        "liquidation",  # Liquidation events
     ]
 
     # Subscribe to private streams
     private_streams = [
-        "account.orderUpdate.SOL_USDC",        # Order updates
-        "account.positionUpdate.SOL_USDC"      # Position updates
+        "account.orderUpdate.SOL_USDC",  # Order updates
+        "account.positionUpdate.SOL_USDC",  # Position updates
     ]
 
     # Register handlers for different stream types
