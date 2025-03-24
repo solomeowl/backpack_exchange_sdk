@@ -66,9 +66,11 @@ class AuthenticationClient:
 
     def _generate_signature(self, action: str, timestamp: int, params=None):
         if params:
-            if "postOnly" in params:
-                params = params.copy()
-                params["postOnly"] = str(params["postOnly"]).lower()
+            params = params.copy()
+            for key, value in params.items():
+                if isinstance(value, bool):
+                    params[key] = str(value).lower()
+
             param_str = "&" + "&".join(f"{k}={v}" for k, v in sorted(params.items()))
         else:
             param_str = ""
