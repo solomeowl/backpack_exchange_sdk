@@ -5,6 +5,17 @@ import time
 import requests
 from cryptography.hazmat.primitives.asymmetric import ed25519
 
+from enums.RequestEnums import (
+    CancelOrderType,
+    FillType,
+    MarketType,
+    OrderSide,
+    OrderType,
+    SelfTradePrevention,
+    SettlementSourceFilter,
+    TimeInForce,
+)
+
 
 class AuthenticationClient:
     base_url = "https://api.backpack.exchange/"
@@ -29,6 +40,10 @@ class AuthenticationClient:
                 response = self.session.get(url, headers=headers, params=params)
             elif method == "DELETE":
                 response = self.session.delete(url, headers=headers, data=json.dumps(params))
+            elif method == "PATCH":
+                response = self.session.patch(url, headers=headers, data=json.dumps(params))
+            elif method == "PUT":
+                response = self.session.put(url, headers=headers, data=json.dumps(params))
             else:
                 response = self.session.post(url, headers=headers, data=json.dumps(params))
 
@@ -103,6 +118,53 @@ class AuthenticationClient:
 
         self._send_request("PATCH", "api/v1/account", "accountUpdate", data)
 
+    def get_max_borrow_quantity(self, symbol: str) -> str:
+        """
+        Retrieves the maxmimum quantity an account can borrow for a given asset based on the accounts existing exposure and margin requirements.
+        """
+        return self._send_request("GET", "api/v1/account/limits/borrow", "maxBorrowQuantity", params={"symbol": symbol})
+
+    def get_max_order_quantity(
+        self,
+        symbol: str,
+        side: str,
+        price: str = None,
+        reduceOnly: bool = None,
+        autoBorrow: bool = None,
+        autoBorrowRepay: bool = None,
+        autoLendRedeem: bool = None,
+    ) -> str:
+        """
+        Retrieves the maximum quantity an account can trade for a given symbol based on the account's balances, existing exposure and margin requirements.
+        """
+        params = {"symbol": symbol, "side": side}
+
+        if price is not None:
+            params["price"] = price
+        if reduceOnly is not None:
+            params["reduceOnly"] = reduceOnly
+        if autoBorrow is not None:
+            params["autoBorrow"] = autoBorrow
+        if autoBorrowRepay is not None:
+            params["autoBorrowRepay"] = autoBorrowRepay
+        if autoLendRedeem is not None:
+            params["autoLendRedeem"] = autoLendRedeem
+
+        return self._send_request("GET", "api/v1/account/limits/order", "maxOrderQuantity", params)
+
+    def get_max_withdrawal_quantity(self, symbol: str, autoBorrow: bool = None, autoLendRedeem: bool = None) -> str:
+        """
+        Retrieves the maximum quantity an account can withdraw for a given asset based on the account's existing exposure and margin requirements.
+        """
+        params = {"symbol": symbol}
+
+        if autoBorrow is not None:
+            params["autoBorrow"] = autoBorrow
+        if autoLendRedeem is not None:
+            params["autoLendRedeem"] = autoLendRedeem
+
+        return self._send_request("GET", "api/v1/account/limits/withdrawal", "maxWithdrawalQuantity", params)
+
     # ================================================================
     # Borrow Lend - Borrowing and lending.
     # ================================================================
@@ -110,7 +172,7 @@ class AuthenticationClient:
         """
         Retrieves all the open borrow lending positions for the account.
         """
-        return self._send_request("GET", "api/v1/borrow-lend/positions", "borrowLendPositionQuery")
+        return self._send_request("GET", "api/v1/borrowLend/positions", "borrowLendPositionQuery")
 
     def execute_borrow_lend(self, quantity: str, side: str, symbol: str) -> None:
         """
@@ -118,7 +180,7 @@ class AuthenticationClient:
         """
         data = {"quantity": quantity, "side": side, "symbol": symbol}
 
-        self._send_request("POST", "api/v1/borrow-lend", "borrowLendExecute", data)
+        self._send_request("POST", "api/v1/borrowLend", "borrowLendExecute", data)
 
     # ================================================================
     # Capital - Capital management.
@@ -277,7 +339,8 @@ class AuthenticationClient:
         symbol: str = None,
         limit: int = 100,
         offset: int = 0,
-        fillType: str = None,
+        fillType: FillType = None,
+        marketType: MarketType = None,
     ):
         """
         Retrieves historical fills, with optional filtering for a specific order or symbol.
@@ -292,7 +355,9 @@ class AuthenticationClient:
         if symbol:
             params["symbol"] = symbol
         if fillType:
-            params["fillType"] = fillType
+            params["fillType"] = fillType.value
+        if marketType:
+            params["marketType"] = marketType.value
         return self._send_request("GET", "wapi/v1/history/fills", "fillHistoryQueryAll", params)
 
     def get_funding_payments(self, subaccountId: int = None, symbol: str = None, limit: int = 100, offset: int = 0):
@@ -306,7 +371,9 @@ class AuthenticationClient:
             params["symbol"] = symbol
         return self._send_request("GET", "wapi/v1/history/funding", "fundingHistoryQueryAll", params)
 
-    def get_order_history(self, orderId: str = None, symbol: str = None, limit: int = 100, offset: int = 0):
+    def get_order_history(
+        self, orderId: str = None, symbol: str = None, limit: int = 100, offset: int = 0, marketType: MarketType = None
+    ):
         """
         Retrieves the order history for the user. This includes orders that have been filled and are no longer on
         the book. It may include orders that are on the book, but the /orders endpoint contains more up-to date data.
@@ -316,6 +383,8 @@ class AuthenticationClient:
             params["symbol"] = symbol
         if orderId:
             params["orderId"] = orderId
+        if marketType:
+            params["marketType"] = marketType.value
         return self._send_request("GET", "wapi/v1/history/orders", "orderHistoryQueryAll", params)
 
     def get_pnl_history(self, subaccountId: int = None, symbol: str = None, limit: int = 100, offset: int = 0):
@@ -329,13 +398,13 @@ class AuthenticationClient:
             params["symbol"] = symbol
         return self._send_request("GET", "wapi/v1/history/pnl", "pnlHistoryQueryAll", params)
 
-    def get_settlement_history(self, limit: int = 100, offset: int = 0, source: str = None):
+    def get_settlement_history(self, limit: int = 100, offset: int = 0, source: SettlementSourceFilter = None):
         """
         History of settlement operations for the account.
         """
         params = {"limit": limit, "offset": offset}
         if source:
-            params["source"] = source
+            params["source"] = source.value
         return self._send_request("GET", "wapi/v1/history/settlement", "settlementHistoryQueryAll", params)
 
     # ================================================================
@@ -358,60 +427,120 @@ class AuthenticationClient:
 
     def execute_order(
         self,
-        orderType: str,
-        side: str,
+        orderType: OrderType,
+        side: OrderSide,
         symbol: str,
         postOnly: bool = False,
         clientId: int = None,
         price: str = None,
         quantity: str = None,
-        timeInForce: str = None,
+        timeInForce: TimeInForce = None,
         quoteQuantity: str = None,
-        selfTradePrevention: str = None,
+        selfTradePrevention: SelfTradePrevention = None,
         triggerPrice: str = None,
         reduceOnly: bool = None,
         autoBorrow: bool = None,
         autoBorrowRepay: bool = None,
         autoLend: bool = None,
         autoLendRedeem: bool = None,
+        stopLossTriggerPrice: str = None,
+        stopLossLimitPrice: str = None,
+        takeProfitTriggerPrice: str = None,
+        takeProfitLimitPrice: str = None,
+        triggerQuantity: str = None,
     ):
         """
         Executes an order on the order book. If the order is not immediately filled,
         it will be placed on the order book.
+
+        Args:
+            orderType: Order type, market or limit.
+            side: Order side, Bid (buy) or Ask (sell).
+            symbol: The market for the order.
+            postOnly: Only post liquidity, do not take liquidity.
+            clientId: Custom order id.
+            price: The order price if this is a limit order.
+            quantity: The order quantity. Market orders must specify either a quantity or quoteQuantity.
+            timeInForce: How long the order is good for (GTC, IOC, FOK).
+            quoteQuantity: The maximum amount of the quote asset to spend (Ask) or receive (Bid) for market orders.
+            selfTradePrevention: Action to take if the user crosses themselves in the order book.
+            triggerPrice: Trigger price if this is a conditional order.
+            reduceOnly: If true then the order can only reduce the position. Futures only.
+            autoBorrow: If true then the order can borrow. Spot margin only.
+            autoBorrowRepay: If true then the order can repay a borrow. Spot margin only.
+            autoLend: If true then the order can lend. Spot margin only.
+            autoLendRedeem: If true then the order can redeem a lend if required. Spot margin only.
+            stopLossTriggerPrice: Reference price that should trigger the stop loss order.
+            stopLossLimitPrice: Stop loss limit price. If set the stop loss will be a limit order.
+            takeProfitTriggerPrice: Reference price that should trigger the take profit order.
+            takeProfitLimitPrice: Take profit limit price. If set the take profit will be a limit order.
+            triggerQuantity: Trigger quantity type if this is a trigger order.
+
+        Returns:
+            The order execution response.
         """
         data = {
-            "orderType": orderType,
+            "orderType": orderType.value if isinstance(orderType, OrderType) else orderType,
             "symbol": symbol,
-            "side": side,
+            "side": side.value if isinstance(side, OrderSide) else side,
         }
-        if orderType == "Limit":
+
+        if orderType == OrderType.LIMIT or orderType == "Limit":
             data["price"] = price
             data["quantity"] = quantity
             if timeInForce:
-                data["timeInForce"] = timeInForce
+                data["timeInForce"] = timeInForce.value if isinstance(timeInForce, TimeInForce) else timeInForce
             else:
                 data["postOnly"] = postOnly
-        if orderType == "Market":
+
+        if orderType == OrderType.MARKET or orderType == "Market":
             if quantity:
                 data["quantity"] = quantity
             elif quoteQuantity:
                 data["quoteQuantity"] = quoteQuantity
+
         if clientId:
             data["clientId"] = clientId
+
         if selfTradePrevention:
-            data["selfTradePrevention"] = selfTradePrevention
+            data["selfTradePrevention"] = (
+                selfTradePrevention.value
+                if isinstance(selfTradePrevention, SelfTradePrevention)
+                else selfTradePrevention
+            )
+
         if triggerPrice:
             data["triggerPrice"] = triggerPrice
+
         if reduceOnly is not None:
             data["reduceOnly"] = reduceOnly
+
         if autoBorrow is not None:
             data["autoBorrow"] = autoBorrow
+
         if autoBorrowRepay is not None:
             data["autoBorrowRepay"] = autoBorrowRepay
+
         if autoLend is not None:
             data["autoLend"] = autoLend
+
         if autoLendRedeem is not None:
             data["autoLendRedeem"] = autoLendRedeem
+
+        if stopLossTriggerPrice:
+            data["stopLossTriggerPrice"] = stopLossTriggerPrice
+
+        if stopLossLimitPrice:
+            data["stopLossLimitPrice"] = stopLossLimitPrice
+
+        if takeProfitTriggerPrice:
+            data["takeProfitTriggerPrice"] = takeProfitTriggerPrice
+
+        if takeProfitLimitPrice:
+            data["takeProfitLimitPrice"] = takeProfitLimitPrice
+
+        if triggerQuantity:
+            data["triggerQuantity"] = triggerQuantity
 
         return self._send_request("POST", "api/v1/order", "orderExecute", data)
 
@@ -428,19 +557,37 @@ class AuthenticationClient:
             data["orderId"] = orderId
         return self._send_request("DELETE", "api/v1/order", "orderCancel", data)
 
-    def get_open_orders(self, symbol: str = None):
+    def get_open_orders(self, symbol: str = None, marketType: MarketType = None):
         """
         Retrieves all open orders. If a symbol is provided, only open orders for that market will be returned, otherwise
         all open orders are returned.
+
+        Args:
+            symbol: The symbol of the market for the orders.
+            marketType: The market type for the orders (SPOT, PERP, etc.).
+
+        Returns:
+            List of open orders.
         """
         params = {}
         if symbol:
             params["symbol"] = symbol
+        if marketType:
+            params["marketType"] = marketType.value
         return self._send_request("GET", "api/v1/orders", "orderQueryAll", params)
 
-    def cancel_open_orders(self, symbol: str):
+    def cancel_open_orders(self, symbol: str, orderType: CancelOrderType = None):
         """
         Cancels all open orders on the specified market.
+
+        Args:
+            symbol: Market to cancel orders for.
+            orderType: Type of orders to cancel (RestingLimitOrder or ConditionalOrder).
+
+        Returns:
+            Confirmation of the cancellation.
         """
         params = {"symbol": symbol}
+        if orderType:
+            params["orderType"] = orderType.value
         return self._send_request("DELETE", "api/v1/orders", "orderCancelAll", params)

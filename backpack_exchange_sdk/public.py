@@ -54,17 +54,19 @@ class PublicClient:
         """
         return self._get("api/v1/market", params={"symbol": symbol})
 
-    def get_ticker(self, symbol: str):
+    def get_ticker(self, symbol: str, interval: TickerInterval = TickerInterval.D1):
         """
         Retrieves summarised statistics for the last 24 hours for the given market symbol.
         """
-        return self._get("api/v1/ticker", params={"symbol": symbol})
+        params = {"symbol": symbol, "interval": interval.value}
+        return self._get("api/v1/ticker", params=params)
 
-    def get_tickers(self):
+    def get_tickers(self, interval: TickerInterval = TickerInterval.D1):
         """
         Retrieves summarised statistics for the last 24 hours for all market symbols.
         """
-        return self._get("api/v1/tickers")
+        params = {"interval": interval.value}
+        return self._get("api/v1/tickers", params=params)
 
     def get_depth(self, symbol: str):
         """
@@ -149,7 +151,7 @@ class PublicClient:
     def get_borrow_lend_markets(self):
         """
         Get all borrow lend markets information.
-        
+
         Returns:
             List of dictionaries containing market information including state, interest rates,
             quantities, utilization rates and other parameters for each market.
@@ -159,11 +161,11 @@ class PublicClient:
     def get_borrow_lend_market_history(self, interval: str, symbol: str = None):
         """
         Get borrow lend market history for specified interval and optional symbol.
-        
+
         Args:
             interval (str): Time interval - must be one of: "1d", "1w", "1month", "1year"
             symbol (str, optional): Market symbol to query. If not set, all markets are returned.
-            
+
         Returns:
             Historical borrow lend market data for the specified interval and symbol.
         """
