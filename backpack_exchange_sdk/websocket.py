@@ -1,9 +1,11 @@
+import base64
 import json
 import threading
 import time
 from typing import Callable, Dict, List, Optional
 
 import websocket
+from cryptography.hazmat.primitives.asymmetric import ed25519
 
 
 class WebSocketClient:
@@ -123,6 +125,12 @@ class WebSocketClient:
         signature = self._sign_message(sign_str)
 
         return {"api-key": self.api_key, "signature": signature, "timestamp": str(timestamp), "window": str(window)}
+
+    def _sign_message(self, sign_str: str):
+        private_key_raw = base64.b64decode(self.secret_key)
+        private_key = ed25519.Ed25519PrivateKey.from_private_bytes(private_key_raw)
+        signature = private_key.sign(sign_str.encode())
+        return base64.b64encode(signature).decode()
 
     def subscribe(self, streams: List[str], callback: Callable, is_private: bool = False):
         """
