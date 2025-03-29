@@ -1,5 +1,7 @@
 import requests
 
+from enums.RequestEnums import TickerInterval
+
 
 class PublicClient:
     def __init__(self):
