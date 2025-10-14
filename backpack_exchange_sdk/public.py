@@ -1,6 +1,6 @@
 import requests
 
-from enums.RequestEnums import TickerInterval
+from enums.RequestEnums import TickerInterval, KlineInterval, BorrowLendInterval
 
 
 class PublicClient:
@@ -76,12 +76,18 @@ class PublicClient:
         """
         return self._get("api/v1/depth", params={"symbol": symbol})
 
-    def get_klines(self, symbol: str, interval: str, start_time: int, end_time: int = None):
+    def get_klines(self, symbol: str, interval: KlineInterval, start_time: int, end_time: int = None):
         """
         Get K-Lines for the given market symbol, providing a startTime and optionally an endTime.
         If no endTime is provided, the current time will be used.
+        
+        Args:
+            symbol: Market symbol for the kline query, e.g. SOL_USDC
+            interval: Time interval (KlineInterval enum)
+            start_time: Start timestamp in seconds
+            end_time: Optional end timestamp in seconds
         """
-        params = {"symbol": symbol, "interval": interval, "startTime": start_time}
+        params = {"symbol": symbol, "interval": interval.value, "startTime": start_time}
         if end_time is not None:
             params["endTime"] = end_time
         return self._get("api/v1/klines", params=params)
@@ -160,18 +166,18 @@ class PublicClient:
         """
         return self._get("api/v1/borrowLend/markets")
 
-    def get_borrow_lend_market_history(self, interval: str, symbol: str = None):
+    def get_borrow_lend_market_history(self, interval: BorrowLendInterval, symbol: str = None):
         """
         Get borrow lend market history for specified interval and optional symbol.
 
         Args:
-            interval (str): Time interval - must be one of: "1d", "1w", "1month", "1year"
-            symbol (str, optional): Market symbol to query. If not set, all markets are returned.
+            interval: Time interval (BorrowLendInterval enum)
+            symbol: Optional market symbol to query. If not set, all markets are returned.
 
         Returns:
             Historical borrow lend market data for the specified interval and symbol.
         """
-        params = {"interval": interval}
+        params = {"interval": interval.value}
         if symbol:
             params["symbol"] = symbol
         return self._get("api/v1/borrowLend/markets/history", params=params)
