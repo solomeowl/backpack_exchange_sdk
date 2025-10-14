@@ -1,6 +1,7 @@
 import time
 
 from backpack_exchange_sdk.public import PublicClient
+from enums.RequestEnums import KlineInterval, BorrowLendInterval
 
 public_client = PublicClient()
 
@@ -32,7 +33,7 @@ print(public_client.get_tickers())
 print(public_client.get_depth("SOL_USDC"))
 
 # Get K-Lines for a specific market
-print(public_client.get_klines("SOL_USDC", "1m", int(time.time())))
+print(public_client.get_klines("SOL_USDC", KlineInterval.M1, int(time.time())))
 
 # Get mark price for a specific market
 print(public_client.get_mark_price("SOL_USDC_PERP"))
@@ -71,7 +72,7 @@ print(public_client.get_historical_trades("SOL_USDC_PERP", 10, 0))
 print(public_client.get_borrow_lend_markets())
 
 # Get borrow lend market history for a specific interval
-print(public_client.get_borrow_lend_market_history(interval="1d"))
+print(public_client.get_borrow_lend_market_history(interval=BorrowLendInterval.D1))
 
 # Get borrow lend market history for a specific symbol and interval
-print(public_client.get_borrow_lend_market_history(interval="1w", symbol="SOL"))
+print(public_client.get_borrow_lend_market_history(interval=BorrowLendInterval.W1, symbol="SOL"))
