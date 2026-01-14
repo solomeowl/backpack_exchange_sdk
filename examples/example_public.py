@@ -55,6 +55,9 @@ print(public_client.send_ping())
 # Get system time
 print(public_client.get_system_time())
 
+# Get supported wallets for deposits/withdrawals
+print(public_client.get_wallets())
+
 # ================================================================
 # Trades - Public trade data.
 # ================================================================
@@ -75,3 +78,12 @@ print(public_client.get_borrow_lend_market_history(interval="1d"))
 
 # Get borrow lend market history for a specific symbol and interval
 print(public_client.get_borrow_lend_market_history(interval="1w", symbol="SOL"))
+
+# ================================================================
+# Prediction Markets - Prediction market data.
+# ================================================================
+# Get all prediction markets
+print(public_client.get_prediction_markets())
+
+# Get prediction market tags
+print(public_client.get_prediction_tags())

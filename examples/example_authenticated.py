@@ -1,5 +1,5 @@
 from backpack_exchange_sdk.authenticated import AuthenticationClient
-from enums import RequestEnums
+from backpack_exchange_sdk.enums import OrderType, Side, TimeInForce
 
 client = AuthenticationClient("api_key", "secret_key")
 
@@ -12,6 +12,15 @@ print(client.get_account())
 # Update account settings
 print(client.update_account(autoBorrowSettlements=False, leverageLimit="5"))
 
+# Get maximum borrow quantity
+print(client.get_max_borrow_quantity("SOL"))
+
+# Get maximum order quantity
+print(client.get_max_order_quantity("SOL_USDC", "Bid", price="100"))
+
+# Get maximum withdrawal quantity
+print(client.get_max_withdrawal_quantity("SOL"))
+
 # ================================================================
 # Capital - Capital management.
 # ================================================================
@@ -23,6 +32,18 @@ print(client.request_withdrawal("xxxxxxxxxx", "Solana", "0.1", "SOL", None, "999
 
 # Get collateral information
 print(client.get_collateral())
+
+# Convert dust balance to USDC
+print(client.convert_dust("BONK"))
+
+# Get withdrawal delay settings
+print(client.get_withdrawal_delay())
+
+# Create withdrawal delay (requires 2FA)
+print(client.create_withdrawal_delay(withdrawalDelayHours=24, twoFactorToken="123456"))
+
+# Update withdrawal delay (requires 2FA)
+print(client.update_withdrawal_delay(withdrawalDelayHours=48, twoFactorToken="123456"))
 
 # ================================================================
 # History - Historical account data.
@@ -42,43 +63,71 @@ print(client.get_borrow_position_history())
 # Get funding payments
 print(client.get_funding_payments())
 
-# Get PnL history
-print(client.get_pnl_history())
-
 # Get settlement history
 print(client.get_settlement_history())
+
+# Get dust conversion history
+print(client.get_dust_history())
+
+# Get position history
+print(client.get_position_history())
+
+# Get strategy history
+print(client.get_strategy_history())
+
+# Get RFQ history
+print(client.get_rfq_history())
+
+# Get quote history
+print(client.get_quote_history())
+
+# Get RFQ fill history
+print(client.get_rfq_fill_history())
+
+# Get quote fill history
+print(client.get_quote_fill_history())
 
 # ================================================================
 # Order - Order management.
 # ================================================================
+# Execute a single order
 print(
     client.execute_order(
-        RequestEnums.OrderType.LIMIT.value,
-        RequestEnums.Side.ASK.value,
+        OrderType.LIMIT.value,
+        Side.ASK.value,
         "SOL_USDC",
         postOnly=True,
         clientId=12345,
         price="200",
         quantity="0.1",
-        timeInForce=RequestEnums.TimeInForce.GTC.value,
+        timeInForce=TimeInForce.GTC.value,
         selfTradePrevention="decrementAndCancel",
     )
 )
+
+# Execute batch orders
 print(
-    client.execute_order(
-        RequestEnums.OrderType.LIMIT.value,
-        RequestEnums.Side.BID.value,
-        "SOL_USDC",
-        postOnly=False,
-        clientId=67890,
-        price="195",
-        quantity="0.2",
-        timeInForce=RequestEnums.TimeInForce.IOC.value,
-        reduceOnly=True,
-    )
+    client.execute_batch_orders([
+        {
+            "orderType": OrderType.LIMIT.value,
+            "side": Side.BID.value,
+            "symbol": "SOL_USDC",
+            "price": "100",
+            "quantity": "0.1",
+            "timeInForce": TimeInForce.GTC.value,
+        },
+        {
+            "orderType": OrderType.LIMIT.value,
+            "side": Side.BID.value,
+            "symbol": "SOL_USDC",
+            "price": "99",
+            "quantity": "0.2",
+            "timeInForce": TimeInForce.GTC.value,
+        },
+    ])
 )
+
 print(client.get_users_open_orders("SOL_USDC", 9999))
-print(client.cancel_open_orders("SOL_USDC"))
 print(client.get_open_orders("SOL_USDC"))
 print(client.cancel_open_orders("SOL_USDC"))
 
@@ -89,9 +138,57 @@ print(client.cancel_open_order("SOL_USDC", orderId="123456"))
 # Borrow Lend - Borrowing and lending.
 # ================================================================
 print(client.get_borrow_lend_positions())
-print(client.execute_borrow_lend(quantity="1.0", side="LEND", symbol="SOL"))
+print(client.execute_borrow_lend(quantity="1.0", side="Lend", symbol="SOL"))
+
+# Get estimated liquidation price
+print(client.get_estimated_liquidation_price(borrow="base64_encoded_payload"))
 
 # ================================================================
-# Futures - Futures data.
+# Futures / Positions
 # ================================================================
 print(client.get_open_positions())
+
+# ================================================================
+# RFQ - Request For Quote (for large trades).
+# ================================================================
+# Submit an RFQ
+print(client.submit_rfq(symbol="SOL_USDC_RFQ", side="Bid", quantity="1000"))
+
+# Submit a quote in response to an RFQ (for market makers)
+print(client.submit_quote(rfqId="rfq_123", price="100.5"))
+
+# Accept a quote
+print(client.accept_quote(rfqId="rfq_123", quoteId="quote_456"))
+
+# Refresh an RFQ to extend its time window
+print(client.refresh_rfq(rfqId="rfq_123"))
+
+# Cancel an RFQ
+print(client.cancel_rfq(rfqId="rfq_123"))
+
+# ================================================================
+# Strategy - Algorithmic trading strategies.
+# ================================================================
+# Create a scheduled strategy (TWAP-like)
+print(
+    client.create_strategy(
+        symbol="SOL_USDC",
+        side="Bid",
+        strategyType="Scheduled",
+        quantity="100",
+        intervalMs=60000,  # Execute every 60 seconds
+        subOrders=10,      # Split into 10 sub-orders
+    )
+)
+
+# Get a specific strategy
+print(client.get_strategy(symbol="SOL_USDC", strategyId="strategy_123"))
+
+# Get all open strategies
+print(client.get_open_strategies())
+
+# Cancel a specific strategy
+print(client.cancel_strategy(symbol="SOL_USDC", strategyId="strategy_123"))
+
+# Cancel all strategies for a market
+print(client.cancel_all_strategies(symbol="SOL_USDC"))
