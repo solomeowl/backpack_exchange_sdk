@@ -1,11 +1,18 @@
 # Backpack Exchange SDK
 
-![PyPI - Version](https://img.shields.io/pypi/v/backpack-exchange-sdk?)
+![PyPI - Version](https://img.shields.io/pypi/v/backpack-exchange-sdk?cacheSeconds=300)
 ![Python](https://img.shields.io/badge/python-3.7+-blue.svg)
+![License](https://img.shields.io/pypi/l/backpack-exchange-sdk?cacheSeconds=300)
 
 [English](./README.md) | [简体中文](./README_zh-Hans.md) | [繁體中文](./README_zh-Hant.md) | [日本語](./README_ja.md) | [한국어](./README_ko.md) | [Español](./README_es.md) | **Português**
 
 SDK Python completo para [Backpack Exchange](https://backpack.exchange/). Suporta todos os 70 endpoints da API incluindo REST e WebSocket.
+
+## Documentação do projeto
+
+- [Registro de alterações](./CHANGELOG.md)
+- [Política de segurança](./SECURITY.md)
+- [Guia de contribuição](./CONTRIBUTING.md)
 
 ## Recursos
 

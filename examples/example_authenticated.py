@@ -1,5 +1,10 @@
 from backpack_exchange_sdk.authenticated import AuthenticationClient
-from backpack_exchange_sdk.enums import OrderType, Side, TimeInForce
+from backpack_exchange_sdk.enums import (
+    OrderType,
+    Side,
+    TimeInForce,
+    SelfTradePrevention,
+)
 
 client = AuthenticationClient("api_key", "secret_key")
 
@@ -13,13 +18,13 @@ print(client.get_account())
 print(client.update_account(autoBorrowSettlements=False, leverageLimit="5"))
 
 # Get maximum borrow quantity
-print(client.get_max_borrow_quantity("SOL"))
+print(client.get_max_borrow_quantity("USDC"))
 
 # Get maximum order quantity
 print(client.get_max_order_quantity("SOL_USDC", "Bid", price="100"))
 
 # Get maximum withdrawal quantity
-print(client.get_max_withdrawal_quantity("SOL"))
+print(client.get_max_withdrawal_quantity("USDC"))
 
 # ================================================================
 # Capital - Capital management.
@@ -93,15 +98,15 @@ print(client.get_quote_fill_history())
 # Execute a single order
 print(
     client.execute_order(
-        OrderType.LIMIT.value,
-        Side.ASK.value,
+        OrderType.LIMIT,
+        Side.ASK,
         "SOL_USDC",
         postOnly=True,
         clientId=12345,
         price="200",
         quantity="0.1",
-        timeInForce=TimeInForce.GTC.value,
-        selfTradePrevention="decrementAndCancel",
+        timeInForce=TimeInForce.GTC,
+        selfTradePrevention=SelfTradePrevention.REJECT_TAKER,
     )
 )
 
@@ -127,7 +132,7 @@ print(
     ])
 )
 
-print(client.get_users_open_orders("SOL_USDC", 9999))
+print(client.get_users_open_orders("SOL_USDC", clientId=9999))
 print(client.get_open_orders("SOL_USDC"))
 print(client.cancel_open_orders("SOL_USDC"))
 
@@ -155,10 +160,10 @@ print(client.get_open_positions())
 print(client.submit_rfq(symbol="SOL_USDC_RFQ", side="Bid", quantity="1000"))
 
 # Submit a quote in response to an RFQ (for market makers)
-print(client.submit_quote(rfqId="rfq_123", price="100.5"))
+print(client.submit_quote(rfqId="rfq_123", bidPrice="100.4", askPrice="100.6"))
 
 # Accept a quote
-print(client.accept_quote(rfqId="rfq_123", quoteId="quote_456"))
+print(client.accept_quote(quoteId="quote_456", rfqId="rfq_123"))
 
 # Refresh an RFQ to extend its time window
 print(client.refresh_rfq(rfqId="rfq_123"))
@@ -176,8 +181,8 @@ print(
         side="Bid",
         strategyType="Scheduled",
         quantity="100",
-        intervalMs=60000,  # Execute every 60 seconds
-        subOrders=10,      # Split into 10 sub-orders
+        interval="1m",
+        duration="10m",
     )
 )
 

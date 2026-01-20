@@ -56,7 +56,17 @@ class AuthenticationClient(
     # Class attribute for backward compatibility
     base_url = "https://api.backpack.exchange/"
 
-    def __init__(self, public_key: str, secret_key: str, window: int = 5000):
+    def __init__(
+        self,
+        public_key: str,
+        secret_key: str,
+        window: int = 5000,
+        base_url: Optional[str] = None,
+        timeout: Optional[float] = None,
+        max_retries: int = 0,
+        backoff_factor: float = 0.1,
+        status_forcelist: Optional[List[int]] = None,
+    ):
         """
         Initialize the authenticated client.
 
@@ -64,8 +74,22 @@ class AuthenticationClient(
             public_key: Your Backpack Exchange API public key.
             secret_key: Your Backpack Exchange API secret key (base64 encoded).
             window: Request validity window in milliseconds (default: 5000).
+            base_url: Optional custom base URL for the API.
+            timeout: Optional request timeout in seconds.
+            max_retries: Number of retries for transient errors (default 0).
+            backoff_factor: Backoff factor between retries.
+            status_forcelist: HTTP status codes that trigger retries.
         """
-        super().__init__(public_key, secret_key, window)
+        super().__init__(
+            public_key,
+            secret_key,
+            window,
+            base_url=base_url,
+            timeout=timeout,
+            max_retries=max_retries,
+            backoff_factor=backoff_factor,
+            status_forcelist=status_forcelist,
+        )
 
     def _sign_message(self, message: str) -> str:
         """
