@@ -5,6 +5,8 @@ This module provides the PublicClient class which handles all public
 API endpoints that don't require authentication.
 """
 
+from typing import Optional, List
+
 from backpack_exchange_sdk._base.client import BaseClient
 from backpack_exchange_sdk._mixins.public.assets import AssetsMixin
 from backpack_exchange_sdk._mixins.public.borrow_lend_markets import BorrowLendMarketsMixin
@@ -42,6 +44,19 @@ class PublicClient(
         >>> ticker = client.get_ticker("SOL_USDC")
     """
 
-    def __init__(self):
+    def __init__(
+        self,
+        base_url: str = None,
+        timeout: float = None,
+        max_retries: int = 0,
+        backoff_factor: float = 0.1,
+        status_forcelist: Optional[List[int]] = None,
+    ):
         """Initialize the public client."""
-        super().__init__()
+        super().__init__(
+            base_url=base_url,
+            timeout=timeout,
+            max_retries=max_retries,
+            backoff_factor=backoff_factor,
+            status_forcelist=status_forcelist,
+        )

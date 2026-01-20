@@ -7,9 +7,15 @@ import time
 from typing import Any, Dict, List, Optional
 
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 from cryptography.hazmat.primitives.asymmetric import ed25519
 
-from backpack_exchange_sdk._base.errors import BackpackAPIError, BackpackRequestError
+from backpack_exchange_sdk._base.errors import (
+    BackpackAPIError,
+    BackpackRequestError,
+    get_error_class,
+)
 from backpack_exchange_sdk._base.utils import (
     generate_auth_headers,
     generate_batch_auth_headers,
@@ -26,15 +32,39 @@ class BaseClient:
 
     DEFAULT_BASE_URL = "https://api.backpack.exchange/"
 
-    def __init__(self, base_url: Optional[str] = None):
+    def __init__(
+        self,
+        base_url: Optional[str] = None,
+        timeout: Optional[float] = None,
+        max_retries: int = 0,
+        backoff_factor: float = 0.1,
+        status_forcelist: Optional[List[int]] = None,
+    ):
         """
         Initialize the base client.
 
         Args:
             base_url: Optional custom base URL for the API
+            timeout: Optional request timeout in seconds
+            max_retries: Number of retries for transient errors (default 0)
+            backoff_factor: Backoff factor between retries
+            status_forcelist: HTTP status codes that trigger retries
         """
         self.base_url = base_url or self.DEFAULT_BASE_URL
+        self.timeout = timeout
         self.session = requests.Session()
+
+        if max_retries > 0:
+            retry = Retry(
+                total=max_retries,
+                backoff_factor=backoff_factor,
+                status_forcelist=status_forcelist or [429, 500, 502, 503, 504],
+                allowed_methods=["GET", "POST", "PUT", "PATCH", "DELETE"],
+                raise_on_status=False,
+            )
+            adapter = HTTPAdapter(max_retries=retry)
+            self.session.mount("http://", adapter)
+            self.session.mount("https://", adapter)
 
     def _handle_response(self, response: requests.Response) -> Any:
         """
@@ -59,10 +89,12 @@ class BaseClient:
         else:
             try:
                 error = response.json()
-                raise BackpackAPIError(
-                    code=error.get("code"),
+                error_code = error.get("code")
+                error_class = get_error_class(error_code)
+                raise error_class(
+                    code=error_code,
                     message=error.get("message"),
-                    status_code=response.status_code
+                    status_code=response.status_code,
                 )
             except ValueError:
                 raise BackpackAPIError(
@@ -87,7 +119,7 @@ class BaseClient:
         """
         url = f"{self.base_url}{endpoint}"
         try:
-            response = self.session.get(url, params=params)
+            response = self.session.get(url, params=params, timeout=self.timeout)
             return self._handle_response(response)
         except requests.exceptions.RequestException as e:
             raise BackpackRequestError(str(e))
@@ -105,7 +137,11 @@ class AuthenticatedBaseClient(BaseClient):
         public_key: str,
         secret_key: str,
         window: int = 5000,
-        base_url: Optional[str] = None
+        base_url: Optional[str] = None,
+        timeout: Optional[float] = None,
+        max_retries: int = 0,
+        backoff_factor: float = 0.1,
+        status_forcelist: Optional[List[int]] = None,
     ):
         """
         Initialize the authenticated client.
@@ -115,8 +151,18 @@ class AuthenticatedBaseClient(BaseClient):
             secret_key: Base64-encoded private key (secret)
             window: Request validity window in milliseconds (default 5000)
             base_url: Optional custom base URL for the API
+            timeout: Optional request timeout in seconds
+            max_retries: Number of retries for transient errors (default 0)
+            backoff_factor: Backoff factor between retries
+            status_forcelist: HTTP status codes that trigger retries
         """
-        super().__init__(base_url)
+        super().__init__(
+            base_url=base_url,
+            timeout=timeout,
+            max_retries=max_retries,
+            backoff_factor=backoff_factor,
+            status_forcelist=status_forcelist,
+        )
         self.key = public_key
         self.private_key_obj = load_private_key(secret_key)
         self.window = window
@@ -182,22 +228,36 @@ class AuthenticatedBaseClient(BaseClient):
 
         try:
             if method == "GET":
-                response = self.session.get(url, headers=headers, params=params)
+                response = self.session.get(
+                    url, headers=headers, params=params, timeout=self.timeout
+                )
             elif method == "DELETE":
                 response = self.session.delete(
-                    url, headers=headers, data=json.dumps(params) if params else None
+                    url,
+                    headers=headers,
+                    data=json.dumps(params) if params else None,
+                    timeout=self.timeout,
                 )
             elif method == "PATCH":
                 response = self.session.patch(
-                    url, headers=headers, data=json.dumps(params) if params else None
+                    url,
+                    headers=headers,
+                    data=json.dumps(params) if params else None,
+                    timeout=self.timeout,
                 )
             elif method == "PUT":
                 response = self.session.put(
-                    url, headers=headers, data=json.dumps(params) if params else None
+                    url,
+                    headers=headers,
+                    data=json.dumps(params) if params else None,
+                    timeout=self.timeout,
                 )
             else:  # POST
                 response = self.session.post(
-                    url, headers=headers, data=json.dumps(params) if params else None
+                    url,
+                    headers=headers,
+                    data=json.dumps(params) if params else None,
+                    timeout=self.timeout,
                 )
 
             return self._handle_response(response)
@@ -239,7 +299,9 @@ class AuthenticatedBaseClient(BaseClient):
             headers.update(extra_headers)
 
         try:
-            response = self.session.post(url, headers=headers, data=json.dumps(orders))
+            response = self.session.post(
+                url, headers=headers, data=json.dumps(orders), timeout=self.timeout
+            )
             return self._handle_response(response)
         except requests.exceptions.RequestException as e:
             raise BackpackRequestError(str(e))

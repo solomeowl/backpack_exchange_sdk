@@ -1,11 +1,18 @@
 # Backpack Exchange SDK
 
-![PyPI - Version](https://img.shields.io/pypi/v/backpack-exchange-sdk?)
+![PyPI - Version](https://img.shields.io/pypi/v/backpack-exchange-sdk?cacheSeconds=300)
 ![Python](https://img.shields.io/badge/python-3.7+-blue.svg)
+![License](https://img.shields.io/pypi/l/backpack-exchange-sdk?cacheSeconds=300)
 
 [English](./README.md) | [简体中文](./README_zh-Hans.md) | [繁體中文](./README_zh-Hant.md) | [日本語](./README_ja.md) | **한국어** | [Español](./README_es.md) | [Português](./README_pt.md)
 
 [Backpack Exchange](https://backpack.exchange/)를 위한 완전한 Python SDK. REST와 WebSocket을 포함한 70개의 모든 API 엔드포인트를 지원합니다.
+
+## 프로젝트 문서
+
+- [변경 기록](./CHANGELOG.md)
+- [보안 정책](./SECURITY.md)
+- [기여 가이드](./CONTRIBUTING.md)
 
 ## 기능
 

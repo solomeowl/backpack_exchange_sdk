@@ -2,10 +2,11 @@ from setuptools import find_packages, setup
 
 setup(
     name="backpack_exchange_sdk",
-    version="1.1.3",
+    version="1.1.4",
     author="solomeowl",
     author_email="j19940430@gmail.com",
     description="A simple SDK for backpack exchange",
+    license="MIT",
     long_description=open("README.md", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
     url="https://github.com/solomeowl/backpack_exchange_sdk",
@@ -13,6 +14,7 @@ setup(
         "Source": "https://github.com/solomeowl/backpack_exchange_sdk",
     },
     packages=find_packages(exclude=["tests"]),
+    package_data={"backpack_exchange_sdk": ["py.typed"]},
     install_requires=[
         "requests>=2.31.0",
         "cryptography>=42.0.5",
@@ -27,4 +29,15 @@ setup(
         ],
     },
     python_requires=">=3.7",
+    classifiers=[
+        "License :: OSI Approved :: MIT License",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.13",
+    ],
 )

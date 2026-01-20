@@ -1,11 +1,18 @@
 # Backpack Exchange SDK
 
-![PyPI - Version](https://img.shields.io/pypi/v/backpack-exchange-sdk?)
+![PyPI - Version](https://img.shields.io/pypi/v/backpack-exchange-sdk?cacheSeconds=300)
 ![Python](https://img.shields.io/badge/python-3.7+-blue.svg)
+![License](https://img.shields.io/pypi/l/backpack-exchange-sdk?cacheSeconds=300)
 
 [English](./README.md) | **简体中文** | [繁體中文](./README_zh-Hant.md) | [日本語](./README_ja.md) | [한국어](./README_ko.md) | [Español](./README_es.md) | [Português](./README_pt.md)
 
 完整的 [Backpack Exchange](https://backpack.exchange/) Python SDK，支持全部 70 个 API 端点，包含 REST 和 WebSocket。
+
+## 项目文档
+
+- [更新记录](./CHANGELOG.md)
+- [安全政策](./SECURITY.md)
+- [贡献指南](./CONTRIBUTING.md)
 
 ## 功能特性
 
