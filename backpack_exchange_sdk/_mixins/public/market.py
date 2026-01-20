@@ -84,7 +84,8 @@ class MarketMixin:
         symbol: str,
         interval: str,
         start_time: int,
-        end_time: Optional[int] = None
+        end_time: Optional[int] = None,
+        priceType: Optional[str] = None,
     ) -> List[List[Any]]:
         """
         Get K-Lines (candlestick data) for the given market symbol.
@@ -92,8 +93,9 @@ class MarketMixin:
         Args:
             symbol: Market symbol.
             interval: Kline interval (e.g., '1m', '1h', '1d').
-            start_time: Start timestamp in milliseconds.
-            end_time: End timestamp in milliseconds (default: current time).
+            start_time: Start timestamp in seconds.
+            end_time: End timestamp in seconds (default: current time).
+            priceType: Optional price type.
 
         Returns:
             List of kline data arrays.
@@ -101,6 +103,8 @@ class MarketMixin:
         params = {"symbol": symbol, "interval": interval, "startTime": start_time}
         if end_time is not None:
             params["endTime"] = end_time
+        if priceType:
+            params["priceType"] = priceType
         return self._get("api/v1/klines", params=params)
 
     def get_mark_price(self, symbol: str) -> Dict[str, Any]:

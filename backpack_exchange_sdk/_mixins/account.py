@@ -21,7 +21,6 @@ class AccountMixin:
         self,
         autoBorrowSettlements: Optional[bool] = None,
         autoLend: Optional[bool] = None,
-        autoRealizePnl: Optional[bool] = None,
         autoRepayBorrows: Optional[bool] = None,
         leverageLimit: Optional[str] = None,
     ) -> None:
@@ -31,7 +30,6 @@ class AccountMixin:
         Args:
             autoBorrowSettlements: Enable auto borrow for settlements
             autoLend: Enable auto lending
-            autoRealizePnl: Enable auto realize PnL
             autoRepayBorrows: Enable auto repay borrows
             leverageLimit: Maximum leverage limit
         """
@@ -40,8 +38,6 @@ class AccountMixin:
             data["autoBorrowSettlements"] = autoBorrowSettlements
         if autoLend is not None:
             data["autoLend"] = autoLend
-        if autoRealizePnl is not None:
-            data["autoRealizePnl"] = autoRealizePnl
         if autoRepayBorrows is not None:
             data["autoRepayBorrows"] = autoRepayBorrows
         if leverageLimit is not None:
