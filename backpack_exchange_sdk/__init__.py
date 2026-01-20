@@ -27,7 +27,7 @@ try:
 except ImportError:
     WebSocketClient = None  # websocket-client may not be installed
 
-__version__ = "1.1.0"
+__version__ = "1.1.2"
 __all__ = [
     "AuthenticationClient",
     "PublicClient",

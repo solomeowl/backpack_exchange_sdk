@@ -41,7 +41,8 @@ class CapitalMixin:
         fromTimestamp: Optional[int] = None,
         toTimestamp: Optional[int] = None,
         limit: int = 100,
-        offset: int = 0
+        offset: int = 0,
+        excludePlatform: Optional[bool] = None,
     ) -> List[Dict[str, Any]]:
         """
         Retrieves deposit history.
@@ -51,6 +52,7 @@ class CapitalMixin:
             toTimestamp: End timestamp filter.
             limit: Maximum number of results (default 100).
             offset: Pagination offset (default 0).
+            excludePlatform: Exclude platform transfers.
 
         Returns:
             List of deposit records.
@@ -60,6 +62,8 @@ class CapitalMixin:
             params["from"] = fromTimestamp
         if toTimestamp:
             params["to"] = toTimestamp
+        if excludePlatform is not None:
+            params["excludePlatform"] = excludePlatform
         return self._send_request(
             "GET", "wapi/v1/capital/deposits", "depositQueryAll", params
         )
@@ -117,6 +121,7 @@ class CapitalMixin:
         two_factor_token: Optional[str] = None,
         auto_borrow: Optional[bool] = None,
         auto_lend_redeem: Optional[bool] = None,
+        recipient_information: Optional[str] = None,
     ) -> Dict[str, Any]:
         """
         Requests a withdrawal from the exchange.
@@ -130,6 +135,7 @@ class CapitalMixin:
             two_factor_token: 2FA token (required if address not in whitelist).
             auto_borrow: Whether to use auto borrow.
             auto_lend_redeem: Whether to use auto lend redeem.
+            recipient_information: Optional recipient information.
 
         Returns:
             Withdrawal information.
@@ -148,6 +154,8 @@ class CapitalMixin:
             data["autoBorrow"] = auto_borrow
         if auto_lend_redeem is not None:
             data["autoLendRedeem"] = auto_lend_redeem
+        if recipient_information:
+            data["recipientInformation"] = recipient_information
 
         return self._send_request(
             "POST", "wapi/v1/capital/withdrawals", "withdraw", data

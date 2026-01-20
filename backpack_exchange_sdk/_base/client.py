@@ -154,7 +154,8 @@ class AuthenticatedBaseClient(BaseClient):
         method: str,
         endpoint: str,
         action: str,
-        params: Optional[Dict] = None
+        params: Optional[Dict] = None,
+        extra_headers: Optional[Dict[str, str]] = None,
     ) -> Any:
         """
         Send an authenticated request to the API.
@@ -164,6 +165,7 @@ class AuthenticatedBaseClient(BaseClient):
             endpoint: API endpoint (relative to base URL)
             action: The API instruction for signing
             params: Optional request parameters
+            extra_headers: Optional extra headers to include
 
         Returns:
             Parsed API response
@@ -175,6 +177,8 @@ class AuthenticatedBaseClient(BaseClient):
         url = f"{self.base_url}{endpoint}"
         ts = int(time.time() * 1e3)
         headers = self._generate_signature(action, ts, params)
+        if extra_headers:
+            headers.update(extra_headers)
 
         try:
             if method == "GET":
@@ -204,7 +208,8 @@ class AuthenticatedBaseClient(BaseClient):
     def _send_batch_request(
         self,
         endpoint: str,
-        orders: List[Dict[str, Any]]
+        orders: List[Dict[str, Any]],
+        extra_headers: Optional[Dict[str, str]] = None,
     ) -> Any:
         """
         Send a batch order request with special signature handling.
@@ -212,6 +217,7 @@ class AuthenticatedBaseClient(BaseClient):
         Args:
             endpoint: API endpoint (relative to base URL)
             orders: List of order parameter dictionaries
+            extra_headers: Optional extra headers to include
 
         Returns:
             Parsed API response
@@ -229,6 +235,8 @@ class AuthenticatedBaseClient(BaseClient):
             ts,
             self.window
         )
+        if extra_headers:
+            headers.update(extra_headers)
 
         try:
             response = self.session.post(url, headers=headers, data=json.dumps(orders))

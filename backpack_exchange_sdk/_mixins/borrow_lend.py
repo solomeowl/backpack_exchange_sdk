@@ -59,12 +59,17 @@ class BorrowLendMixin:
             "borrowLendPositionLiquidationPrice", params
         )
 
-    def get_open_positions(self, symbol: Optional[str] = None) -> List[Dict[str, Any]]:
+    def get_open_positions(
+        self,
+        symbol: Optional[str] = None,
+        marketType: Optional[str] = None
+    ) -> List[Dict[str, Any]]:
         """
         Retrieves account position summary.
 
         Args:
             symbol: Optional market symbol filter.
+            marketType: Optional market type filter.
 
         Returns:
             List of open positions.
@@ -72,4 +77,6 @@ class BorrowLendMixin:
         params = {}
         if symbol:
             params["symbol"] = symbol
+        if marketType:
+            params["marketType"] = marketType
         return self._send_request("GET", "api/v1/position", "positionQuery", params)

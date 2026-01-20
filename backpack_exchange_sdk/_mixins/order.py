@@ -51,22 +51,28 @@ class OrderMixin:
         symbol: str,
         postOnly: bool = False,
         clientId: Optional[int] = None,
+        brokerId: Optional[int] = None,
         price: Optional[str] = None,
         quantity: Optional[str] = None,
         timeInForce: Optional[Union[TimeInForce, str]] = None,
         quoteQuantity: Optional[str] = None,
         selfTradePrevention: Optional[Union[SelfTradePrevention, str]] = None,
         triggerPrice: Optional[str] = None,
+        triggerBy: Optional[str] = None,
         reduceOnly: Optional[bool] = None,
         autoBorrow: Optional[bool] = None,
         autoBorrowRepay: Optional[bool] = None,
         autoLend: Optional[bool] = None,
         autoLendRedeem: Optional[bool] = None,
         stopLossTriggerPrice: Optional[str] = None,
+        stopLossTriggerBy: Optional[str] = None,
         stopLossLimitPrice: Optional[str] = None,
         takeProfitTriggerPrice: Optional[str] = None,
+        takeProfitTriggerBy: Optional[str] = None,
         takeProfitLimitPrice: Optional[str] = None,
         triggerQuantity: Optional[str] = None,
+        slippageTolerance: Optional[str] = None,
+        slippageToleranceType: Optional[str] = None,
     ) -> Dict[str, Any]:
         """
         Executes an order on the order book.
@@ -77,22 +83,28 @@ class OrderMixin:
             symbol: Market symbol.
             postOnly: Only post liquidity, do not take.
             clientId: Custom order ID.
+            brokerId: Optional broker ID.
             price: Limit order price.
             quantity: Order quantity.
             timeInForce: How long the order is valid (GTC, IOC, FOK).
             quoteQuantity: Quote asset quantity for market orders.
             selfTradePrevention: Self-trade prevention mode.
             triggerPrice: Trigger price for conditional orders.
+            triggerBy: Trigger by source.
             reduceOnly: Order can only reduce position (futures).
             autoBorrow: Enable auto borrow (spot margin).
             autoBorrowRepay: Enable auto borrow repay (spot margin).
             autoLend: Enable auto lend (spot margin).
             autoLendRedeem: Enable auto lend redeem (spot margin).
             stopLossTriggerPrice: Stop loss trigger price.
+            stopLossTriggerBy: Stop loss trigger by source.
             stopLossLimitPrice: Stop loss limit price.
             takeProfitTriggerPrice: Take profit trigger price.
+            takeProfitTriggerBy: Take profit trigger by source.
             takeProfitLimitPrice: Take profit limit price.
             triggerQuantity: Trigger quantity for conditional orders.
+            slippageTolerance: Maximum slippage tolerance.
+            slippageToleranceType: Slippage tolerance type.
 
         Returns:
             Order execution response.
@@ -121,6 +133,8 @@ class OrderMixin:
 
         if clientId:
             data["clientId"] = clientId
+        if brokerId is not None:
+            data["brokerId"] = brokerId
 
         if selfTradePrevention:
             data["selfTradePrevention"] = (
@@ -131,6 +145,8 @@ class OrderMixin:
 
         if triggerPrice:
             data["triggerPrice"] = triggerPrice
+        if triggerBy:
+            data["triggerBy"] = triggerBy
 
         if reduceOnly is not None:
             data["reduceOnly"] = reduceOnly
@@ -149,20 +165,34 @@ class OrderMixin:
 
         if stopLossTriggerPrice:
             data["stopLossTriggerPrice"] = stopLossTriggerPrice
+        if stopLossTriggerBy:
+            data["stopLossTriggerBy"] = stopLossTriggerBy
 
         if stopLossLimitPrice:
             data["stopLossLimitPrice"] = stopLossLimitPrice
 
         if takeProfitTriggerPrice:
             data["takeProfitTriggerPrice"] = takeProfitTriggerPrice
+        if takeProfitTriggerBy:
+            data["takeProfitTriggerBy"] = takeProfitTriggerBy
 
         if takeProfitLimitPrice:
             data["takeProfitLimitPrice"] = takeProfitLimitPrice
 
         if triggerQuantity:
             data["triggerQuantity"] = triggerQuantity
+        if slippageTolerance is not None:
+            data["slippageTolerance"] = slippageTolerance
+        if slippageToleranceType is not None:
+            data["slippageToleranceType"] = slippageToleranceType
 
-        return self._send_request("POST", "api/v1/order", "orderExecute", data)
+        extra_headers = None
+        if brokerId is not None:
+            extra_headers = {"X-Broker-Id": str(brokerId)}
+
+        return self._send_request(
+            "POST", "api/v1/order", "orderExecute", data, extra_headers=extra_headers
+        )
 
     def cancel_open_order(
         self,
@@ -238,7 +268,8 @@ class OrderMixin:
 
     def execute_batch_orders(
         self,
-        orders: List[Dict[str, Any]]
+        orders: List[Dict[str, Any]],
+        brokerId: Optional[int] = None,
     ) -> List[Dict[str, Any]]:
         """
         Submits a batch of orders for execution.
@@ -253,6 +284,7 @@ class OrderMixin:
                 - price: Price for limit orders
                 - quantity: Order quantity
                 - And other optional parameters
+            brokerId: Optional broker ID.
 
         Returns:
             List of order execution results.
@@ -276,4 +308,7 @@ class OrderMixin:
             ]
             results = client.execute_batch_orders(orders)
         """
-        return self._send_batch_request("api/v1/orders", orders)
+        extra_headers = None
+        if brokerId is not None:
+            extra_headers = {"X-Broker-Id": str(brokerId)}
+        return self._send_batch_request("api/v1/orders", orders, extra_headers=extra_headers)
