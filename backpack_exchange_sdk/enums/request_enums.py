@@ -16,7 +16,6 @@ class SelfTradePrevention(Enum):
     REJECT_TAKER = "RejectTaker"
     REJECT_MAKER = "RejectMaker"
     REJECT_BOTH = "RejectBoth"
-    ALLOW = "Allow"
 
 
 class OrderType(Enum):
@@ -82,11 +81,11 @@ class MarketType(Enum):
     RFQ = "RFQ"
 
 
-class OrderSide(Enum):
-    BID = "Bid"
-    ASK = "Ask"
-
-
 class CancelOrderType(Enum):
     RESTING_LIMIT_ORDER = "RestingLimitOrder"
     CONDITIONAL_ORDER = "ConditionalOrder"
+
+
+class SlippageToleranceType(Enum):
+    TICK_SIZE = "TickSize"
+    PERCENT = "Percent"

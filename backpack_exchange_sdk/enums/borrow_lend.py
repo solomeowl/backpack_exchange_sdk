@@ -32,5 +32,7 @@ class BorrowLendSource(Enum):
     LIQUIDATION_ADL = "LiquidationAdl"
     LIQUIDATION_BACKSTOP = "LiquidationBackstop"
     MANUAL = "Manual"
-    SETTLEMENT = "Settlement"
+    RECONCILIATION = "Reconciliation"
+    RFQ = "Rfq"
+    SPOT_MARGIN = "SpotMargin"
     WITHDRAWAL = "Withdrawal"

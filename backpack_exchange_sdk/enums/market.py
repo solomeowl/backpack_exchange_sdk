@@ -19,6 +19,7 @@ class KlineInterval(Enum):
     H8 = "8h"
     H12 = "12h"
     D1 = "1d"
+    D3 = "3d"
     W1 = "1w"
     MONTH1 = "1month"
 

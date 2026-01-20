@@ -163,3 +163,4 @@ cython_debug/
 
 # OpenAPI spec (optional, remove if you want to track it)
 # openapi.json
+backpack_openapi_full_expanded.txt

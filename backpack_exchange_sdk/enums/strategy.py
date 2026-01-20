@@ -29,7 +29,17 @@ class StrategyCrankCancelReason(Enum):
     INVALID_QUANTITY = "InvalidQuantity"
     INSUFFICIENT_MARGIN = "InsufficientMargin"
     LIQUIDATION = "Liquidation"
-    MARKET_CLOSED = "MarketClosed"
     PRICE_OUT_OF_BOUNDS = "PriceOutOfBounds"
-    REDUCE_ONLY = "ReduceOnly"
+    REDUCE_ONLY_NOT_REDUCED = "ReduceOnlyNotReduced"
+    SELF_TRADE_PREVENTION = "SelfTradePrevention"
     UNKNOWN = "Unknown"
+    USER_PERMISSIONS = "UserPermissions"
+
+
+class SeriesRecurrence(Enum):
+    """Series recurrence."""
+    HOURLY = "hourly"
+    DAILY = "daily"
+    WEEKLY = "weekly"
+    MONTHLY = "monthly"
+    ANNUAL = "annual"

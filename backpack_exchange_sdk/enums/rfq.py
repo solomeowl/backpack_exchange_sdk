@@ -16,17 +16,3 @@ class RfqFillType(Enum):
     USER = "User"
     COLLATERAL_CONVERSION = "CollateralConversion"
 
-
-class RfqStatus(Enum):
-    """RFQ status."""
-    NEW = "New"
-    FILLED = "Filled"
-    CANCELLED = "Cancelled"
-    EXPIRED = "Expired"
-
-
-class QuoteStatus(Enum):
-    """Quote status."""
-    NEW = "New"
-    FILLED = "Filled"
-    CANCELLED = "Cancelled"

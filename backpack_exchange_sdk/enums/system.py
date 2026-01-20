@@ -5,12 +5,6 @@ System related enums for Backpack Exchange SDK.
 from enum import Enum
 
 
-class SystemStatus(Enum):
-    """System status."""
-    OK = "Ok"
-    MAINTENANCE = "Maintenance"
-
-
 class SystemOrderType(Enum):
     """System order type."""
     COLLATERAL_CONVERSION = "CollateralConversion"

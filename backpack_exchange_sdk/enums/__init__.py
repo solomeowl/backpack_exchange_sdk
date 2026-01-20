@@ -18,8 +18,8 @@ from backpack_exchange_sdk.enums.request_enums import (
     TickerInterval,
     FillType,
     MarketType,
-    OrderSide,
     CancelOrderType,
+    SlippageToleranceType,
 )
 
 # Response enums (renamed from ResponseEnums.py for PEP8 compliance)
@@ -29,7 +29,6 @@ from backpack_exchange_sdk.enums.response_enums import Status
 from backpack_exchange_sdk.enums.common import (
     Blockchain,
     SortDirection,
-    TriggerBy,
 )
 
 # Market enums
@@ -51,6 +50,10 @@ from backpack_exchange_sdk.enums.capital import (
     DepositStatus,
     WithdrawalStatus,
     DepositSource,
+    FiatAsset,
+    EqualsMoneyWithdrawalState,
+    SettlementSource,
+    CustodyAsset,
 )
 
 # Borrow/lend enums
@@ -64,8 +67,6 @@ from backpack_exchange_sdk.enums.borrow_lend import (
 from backpack_exchange_sdk.enums.rfq import (
     RfqExecutionMode,
     RfqFillType,
-    RfqStatus,
-    QuoteStatus,
 )
 
 # Strategy enums
@@ -73,6 +74,7 @@ from backpack_exchange_sdk.enums.strategy import (
     StrategyTypeEnum,
     StrategyStatus,
     StrategyCrankCancelReason,
+    SeriesRecurrence,
 )
 
 # Position enums
@@ -83,7 +85,6 @@ from backpack_exchange_sdk.enums.position import (
 
 # System enums
 from backpack_exchange_sdk.enums.system import (
-    SystemStatus,
     SystemOrderType,
 )
 
@@ -104,14 +105,13 @@ __all__ = [
     "TickerInterval",
     "FillType",
     "MarketType",
-    "OrderSide",
     "CancelOrderType",
+    "SlippageToleranceType",
     # Response enums
     "Status",
     # Common
     "Blockchain",
     "SortDirection",
-    "TriggerBy",
     # Market
     "KlineInterval",
     "KlinePriceType",
@@ -124,6 +124,10 @@ __all__ = [
     "DepositStatus",
     "WithdrawalStatus",
     "DepositSource",
+    "FiatAsset",
+    "EqualsMoneyWithdrawalState",
+    "SettlementSource",
+    "CustodyAsset",
     # Borrow/lend
     "BorrowLendBookState",
     "BorrowLendMarketHistoryInterval",
@@ -131,17 +135,15 @@ __all__ = [
     # RFQ
     "RfqExecutionMode",
     "RfqFillType",
-    "RfqStatus",
-    "QuoteStatus",
     # Strategy
     "StrategyTypeEnum",
     "StrategyStatus",
     "StrategyCrankCancelReason",
+    "SeriesRecurrence",
     # Position
     "PositionState",
     "PaymentType",
     # System
-    "SystemStatus",
     "SystemOrderType",
     # Errors
     "ApiErrorCode",

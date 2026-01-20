@@ -7,9 +7,9 @@ from typing import Any, Dict, List, Optional, Union
 from backpack_exchange_sdk.enums import (
     CancelOrderType,
     MarketType,
-    OrderSide,
     OrderType,
     SelfTradePrevention,
+    Side,
     TimeInForce,
 )
 
@@ -47,7 +47,7 @@ class OrderMixin:
     def execute_order(
         self,
         orderType: Union[OrderType, str],
-        side: Union[OrderSide, str],
+        side: Union[Side, str],
         symbol: str,
         postOnly: bool = False,
         clientId: Optional[int] = None,
@@ -112,7 +112,7 @@ class OrderMixin:
         data = {
             "orderType": orderType.value if isinstance(orderType, OrderType) else orderType,
             "symbol": symbol,
-            "side": side.value if isinstance(side, OrderSide) else side,
+            "side": side.value if isinstance(side, Side) else side,
         }
 
         if orderType == OrderType.LIMIT or orderType == "Limit":
