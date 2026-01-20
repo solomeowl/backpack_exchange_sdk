@@ -3,6 +3,7 @@
 ![PyPI - Version](https://img.shields.io/pypi/v/backpack-exchange-sdk?cacheSeconds=300)
 ![Python](https://img.shields.io/badge/python-3.7+-blue.svg)
 ![License](https://img.shields.io/pypi/l/backpack-exchange-sdk?cacheSeconds=300)
+![CI](https://github.com/solomeowl/backpack_exchange_sdk/actions/workflows/ci.yml/badge.svg)
 
 [English](./README.md) | [简体中文](./README_zh-Hans.md) | [繁體中文](./README_zh-Hant.md) | [日本語](./README_ja.md) | [한국어](./README_ko.md) | [Español](./README_es.md) | **Português**
 
